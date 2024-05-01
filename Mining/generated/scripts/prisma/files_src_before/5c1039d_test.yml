@@ -1,0 +1,530 @@
+name: CI
+
+# Run on push only for master, if not it will trigger push & pull_request on PRs at the same time
+on:
+  push:
+    branches:
+      - master
+    paths-ignore:
+      - "*.md"
+      - ".buildkite/**"
+      - "docs/**"
+      - "scripts/**"
+      - ".prettierrc.yml"
+      - ".dockerignore"
+      - "LICENSE"
+  pull_request:
+
+env:
+  PRISMA_TELEMETRY_INFORMATION: "prisma test.yml"
+  GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+
+jobs:
+  # From https://github.com/marketplace/actions/workflow-run-cleanup-action
+  # This action cleans up previously running instances of a workflow on the same branch.
+  # This accomplishes the task of automatically cancelling CI runs on pushes to the same branch,
+  # which is a common feature in most CI systems but currently not possible with GitHub actions.
+  cleanup-runs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: rokroskar/workflow-run-cleanup-action@master
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+    if: "!startsWith(github.ref, 'refs/tags/') && github.ref != 'refs/heads/master'"
+
+  #
+  # CLI-INTEGRATION
+  #
+  cli-integration:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        test:
+          - sqlite
+          - postgresql
+          - mysql
+          - mariadb
+        node: [12]
+
+    services:
+      postgres:
+        image: postgres:9
+        env:
+          POSTGRES_DB: tests
+          POSTGRES_USER: prisma
+          POSTGRES_PASSWORD: prisma
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      # mysql:8.0 would not work as we use `mariadb` node lib and it doesn't support the latest default password algorithm
+      # https://stackoverflow.com/questions/60902904/how-to-pass-mysql-native-password-to-mysql-service-in-github-actions
+      mysql:
+        image: bitnami/mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tests
+          MYSQL_USER: prisma
+          MYSQL_PASSWORD: prisma
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+
+      mariadb:
+        image: mariadb:10
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tests
+          MYSQL_USER: prisma
+          MYSQL_PASSWORD: prisma
+        ports:
+          - 3306
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm i sqlite3@4 --unsafe-perm --reporter=silent
+        if: ${{ matrix.test == 'sqlite' }}
+        working-directory: src/packages/cli
+
+      # temp
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+
+      - run: pnpm run jest integration/${{ matrix.test }} -- --forceExit --maxConcurrency=1
+        working-directory: src/packages/cli
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          TEST_POSTGRES_BASE_URI: postgres://prisma:prisma@localhost:${{ job.services.postgres.ports[5432] }}
+          TEST_MYSQL_BASE_URI: mysql://root:root@localhost:${{ job.services.mysql.ports[3306] }}
+          TEST_MARIADB_BASE_URI: mysql://root:root@localhost:${{ job.services.mariadb.ports[3306] }}
+          TEST_POSTGRES_URI: postgres://prisma:prisma@localhost:${{ job.services.postgres.ports[5432] }}/tests
+          TEST_MYSQL_URI: mysql://root:root@localhost:${{ job.services.mysql.ports[3306] }}/tests
+          TEST_MARIADB_URI: mysql://root:root@localhost:${{ job.services.mariadb.ports[3306] }}/tests
+
+  #
+  # CLI-COMMANDS
+  #
+  cli-commands:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [12]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm run test:commands
+        working-directory: src/packages/cli
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+  #
+  # CLIENT
+  #
+  client:
+    timeout-minutes: 20
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [12]
+
+    services:
+      postgres:
+        image: postgres:9
+        env:
+          POSTGRES_DB: tests
+          POSTGRES_USER: prisma
+          POSTGRES_PASSWORD: prisma
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+      # mysql:8.0 would not work as we use `mariadb` node lib and it doesn't support the latest default password algorithm
+      # https://stackoverflow.com/questions/60902904/how-to-pass-mysql-native-password-to-mysql-service-in-github-actions
+      mysql:
+        image: bitnami/mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tests
+          MYSQL_USER: prisma
+          MYSQL_PASSWORD: prisma
+          MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval 10s --health-timeout 5s --health-retries 3
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm run test
+        working-directory: src/packages/client
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          TEST_POSTGRES_URI: postgres://prisma:prisma@localhost:${{ job.services.postgres.ports[5432] }}/tests
+          TEST_MYSQL_URI: mysql://root:root@localhost:${{ job.services.mysql.ports[3306] }}/tests
+
+      - name: Upload coverage report
+        working-directory: src/packages/client
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F client -f ./src/__tests__/coverage/clover.xml
+
+  #
+  # SDK
+  #
+  sdk:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [12]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm run test
+        working-directory: src/packages/sdk
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/sdk
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F sdk -f ./src/__tests__/coverage/clover.xml
+
+  #
+  # MIGRATE
+  #
+  migrate:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [12]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm i sqlite3@4 --unsafe-perm --reporter=silent
+        working-directory: src/packages/cli
+
+      - run: pnpm run test
+        working-directory: src/packages/migrate
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/migrate
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F migrate -f ./src/__tests__/coverage/clover.xml
+
+  #
+  # INTROSPECTION
+  #
+  introspection:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [12]
+
+    services:
+      postgres:
+        image: postgres:9
+        env:
+          POSTGRES_DB: tests
+          POSTGRES_USER: prisma
+          POSTGRES_PASSWORD: prisma
+        ports:
+          - 5432/tcp
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm run test
+        working-directory: src/packages/introspection
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+          TEST_POSTGRES_URI: postgres://prisma:prisma@localhost:${{ job.services.postgres.ports[5432] }}/tests
+
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/introspection
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F introspection -f ./src/__tests__/coverage/clover.xml
+  #
+  # All the other packages!
+  #
+  others:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+        node: [12]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      # From https://docs.github.com/en/actions/configuring-and-managing-workflows/caching-dependencies-to-speed-up-workflows#example-using-the-cache-action
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - uses: actions/setup-node@v2-beta
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: bash .github/workflows/setup.sh
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+
+      - run: pnpm run test
+        name: "debug"
+        working-directory: src/packages/debug
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/debug
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F debug -f ./src/__tests__/coverage/clover.xml
+
+      - run: pnpm run test
+        name: "engine-core"
+        working-directory: src/packages/engine-core
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/engine-core
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F engine-core -f ./src/__tests__/coverage/clover.xml
+
+      - run: pnpm run test
+        name: "fetch-engine"
+        working-directory: src/packages/fetch-engine
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/fetch-engine
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F fetch-engine -f ./src/__tests__/coverage/clover.xml
+
+      - run: pnpm run test
+        name: "generator-helper"
+        working-directory: src/packages/generator-helper
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/generator-helper
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F generator-helper -f ./src/__tests__/coverage/clover.xml
+
+      - run: pnpm run test
+        name: "get-platform"
+        working-directory: src/packages/get-platform
+        env:
+          CI: true
+          SKIP_GIT: true
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+      - name: Upload coverage report
+        if: ${{ !contains(github.actor, 'bot') && matrix.os == 'ubuntu-latest' }}
+        working-directory: src/packages/get-platform
+        run: |
+          bash <(curl -s https://codecov.io/bash) -F get-platform -f ./src/__tests__/coverage/clover.xml
