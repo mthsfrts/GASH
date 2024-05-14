@@ -1,12 +1,12 @@
 class AntiPattern:
     """
-    A class to represent an antiPattern struct.
-    Parameters that will be used in the antiPattern structure:
-        - type: The type of the antiPattern
-        - description: A description of the antiPattern
-        - location: The location of the antiPattern
-        - severity: The severity of the antiPattern
-        - additional_info: Additional information about the antiPattern
+    A class to represent a smell struct.
+    Parameters that will be used in the smell structure:
+        - type: The type of the smell
+        - description: A description of the smell
+        - location: The location of the smell
+        - severity: The severity of the smell
+        - additional_info: Additional information about the smell
     """
 
     def __init__(self):
@@ -17,7 +17,7 @@ class AntiPattern:
         self.additional_info = {}
 
 
-# Dictionaries and Lists params for the antiPatterns
+# Dictionaries and Lists params for the smells
 SEVERITIES = {
     "CodeDuplicity": {
         "severity": "Medium",

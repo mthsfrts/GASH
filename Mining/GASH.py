@@ -13,9 +13,9 @@ d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
 
 import Mining.Analysis.Parse.GHYamlParse as GHYamlParse
-from Mining.Analysis.AntiPatternsDetectors import ORetriesDetectors as Retries, OConditionsDetector as Conditionals, \
-    OWorkflowDispatchDetector as Wd, OVulnerabilityDetector as Vulnerability, OContinuesOnErrorDetector as CoE, \
-    OGlobalsDetector as Globals, OCodeQualityDetector as Cq
+from Mining.Analysis.Smells.Detectors import WorkflowDispatchDetector as Wd, RetriesDetectors as Retries, \
+    GlobalsDetector as Globals, VulnerabilityDetector as Vulnerability, ContinuesOnErrorDetector as CoE, \
+    CodeQualityDetector as Cq, ConditionsDetector as Conditionals
 
 
 class Utils:

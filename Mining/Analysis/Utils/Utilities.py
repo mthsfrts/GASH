@@ -20,12 +20,12 @@ class Utility:
         return matching_lines
 
     @staticmethod
-    def generate_id(commit_short_hash, anti_pattern_abbreviation, line_number):
+    def generate_id(commit_short_hash, smells_abbreviation, line_number):
         """
-        A method that generates a specific ID for a given anti-pattern, commit and line number.
+        A method that generates a specific ID for a given smells, commit and line number.
         Parameters that will be pass to the method are:
             - commit_short_hash: The short hash of the commit.
-            - anti_pattern_abbreviation: The abbreviation of the anti-pattern.
-            - line_number: The line number of the anti-pattern.
+            - smells_abbreviation: The abbreviation of the smells.
+            - line_number: The line number of the smells.
         """
-        return f"{commit_short_hash}{anti_pattern_abbreviation}L{line_number}"
+        return f"{commit_short_hash}{smells_abbreviation}L{line_number}"

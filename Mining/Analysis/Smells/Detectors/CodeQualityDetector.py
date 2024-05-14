@@ -1,13 +1,19 @@
 import re
 from Mining.Analysis.DataStruct import AntiPattern
+from Mining.Analysis.Smells.Strategies.CodeQualitiesSt import DuplicatedCodeCheckStrategy, LongCodeBlockCheckStrategy, \
+    GlobalsCheckStrategy
 from Mining.Analysis.Utils.Utilities import Utility
 
 
 class CodeQualityDetector:
-
     def __init__(self, workflow):
         self.workflow = workflow
         self.severity = AntiPattern.SEVERITIES
+        self.strategies = {
+            "CodeDuplicity": DuplicatedCodeCheckStrategy(),
+            "LongCodeBlock": LongCodeBlockCheckStrategy(),
+            "Globals": GlobalsCheckStrategy()
+        }
 
     def detect(self):
         anti_patterns = []
@@ -33,30 +39,6 @@ class CodeQualityDetector:
 
         return anti_patterns
 
-    @staticmethod
-    def check_code_quality(script):
-        code_quality_issues = {
-            "CodeDuplicity": [],
-            "LongCodeBlock": [],
-            "Globals": []
-        }
-
-        # Check for duplicated code
-        prev_line = None
-        for line in script.split('\n'):
-            if line == prev_line:
-                code_quality_issues["CodeDuplicity"].append(line)
-            prev_line = line
-
-        # Check for large code blocks
-        lines = script.split('\n')
-        if len(lines) > 10:
-            code_quality_issues["LongCodeBlock"].append(script)
-
-        # Check for global variables
-        for line in lines:
-            if line.startswith("global "):
-                variable_name = line.split(" ")[1]
-                code_quality_issues["Globals"].append(variable_name)
-
+    def check_code_quality(self, script):
+        code_quality_issues = {issue_type: strategy.check(script) for issue_type, strategy in self.strategies.items()}
         return code_quality_issues

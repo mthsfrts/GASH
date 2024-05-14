@@ -11,8 +11,8 @@ class Job:
     """
     def __init__(self):
         self.name = None
-        self.machine_type = None  # 'runs-on' field
-        self.steps = []  # List of Step objects
-        self.environment_vars = {}  # 'env' field for the job
-        self.condition = None  # 'if' field
-        self.smells = []  # List of AntiPattern objects
+        self.machine_type = None
+        self.steps = []
+        self.environment_vars = {}
+        self.condition = None
+        self.smells = []

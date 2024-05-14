@@ -8,7 +8,7 @@ class Step:
     - arguments: The arguments to use.\n
     - environment_vars: The environment variables to use.\n
     - condition: The condition to use.\n
-    - antipatterns: The smells to use.\n
+    - smells: The smells to use.\n
 
     """
     def __init__(self):
