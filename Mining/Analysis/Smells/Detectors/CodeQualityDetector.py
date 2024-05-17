@@ -1,5 +1,5 @@
 import re
-from Mining.Analysis.DataStruct import AntiPattern
+from Mining.Analysis.DataStruct import Smells
 from Mining.Analysis.Smells.Strategies.CodeQualitiesSt import DuplicatedCodeCheckStrategy, LongCodeBlockCheckStrategy, \
     GlobalsCheckStrategy
 from Mining.Analysis.Utils.Utilities import Utility

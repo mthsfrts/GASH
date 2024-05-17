@@ -1,5 +1,5 @@
 import re
-from Mining.Analysis.DataStruct import AntiPattern
+from Mining.Analysis.DataStruct.Smells import Smells, SEVERITIES
 from Mining.Analysis.Utils.Utilities import Utility
 from Mining.Analysis.Smells.Strategies.ConditionalST import AlwaysTrueConditionCheckStrategy, \
     AlwaysFalseConditionCheckStrategy, ComplexConditionCheckStrategy, UnnecessaryConditionCheckStrategy, \
@@ -7,41 +7,41 @@ from Mining.Analysis.Smells.Strategies.ConditionalST import AlwaysTrueConditionC
 
 
 class ConditionsDetector:
-    def __init__(self, workflow, valid_variables):
+    def __init__(self, workflow):
         self.workflow = workflow
-        self.severity = AntiPattern.SEVERITIES
+        self.severity = SEVERITIES
         self.strategies = {
             "AlwaysTrue": AlwaysTrueConditionCheckStrategy(),
             "AlwaysFalse": AlwaysFalseConditionCheckStrategy(),
             "ComplexCondition": ComplexConditionCheckStrategy(),
             "UnnecessaryCondition": UnnecessaryConditionCheckStrategy(),
-            "InvalidReference": InvalidReferenceCheckStrategy(valid_variables)
+            "InvalidReference": InvalidReferenceCheckStrategy()
         }
 
     def detect(self):
-        anti_patterns = []
+        smells = []
 
         for job in self.workflow.jobs:
             if job.condition:
-                self._check_conditions(job.condition, job.name, anti_patterns)
+                self._check_conditions(job.condition, job.name, smells)
 
             for step in job.steps:
                 if step.condition:
-                    self._check_conditions(step.condition, f"{job.name} step: {step.name}", anti_patterns)
+                    self._check_conditions(step.condition, f"{job.name} step: {step.name}", smells)
 
-        return anti_patterns
+        return smells
 
-    def _check_conditions(self, condition, location_description, anti_patterns):
+    def _check_conditions(self, condition, location_description, smells):
         for issue_type, strategy in self.strategies.items():
             issues = strategy.check(condition)
             for issue in issues:
                 line_numbers = Utility.find_pattern(self.workflow.raw_content, re.escape(issue))
-                anti_pattern = AntiPattern.AntiPattern()
-                anti_pattern.type = issue_type
-                anti_pattern.description = f"Condition found at '{location_description}': {issue}"
-                anti_pattern.location = f"{line_numbers[0] if line_numbers else 'Unknown'}"
-                anti_pattern.severity = self.severity["Conditionals"]["severity"]
-                anti_pattern.additional_info = {
+                smell = Smells()
+                smell.type = issue_type
+                smell.description = f"Condition found at '{location_description}': {issue}"
+                smell.location = f"{line_numbers[0] if line_numbers else 'Unknown'}"
+                smell.severity = self.severity["Conditionals"]["severity"]
+                smell.additional_info = {
                     "justification": self.severity["Conditionals"]["justification"]
                 }
-                anti_patterns.append(anti_pattern)
+                smells.append(smell)

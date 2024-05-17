@@ -1,4 +1,4 @@
-class AntiPattern:
+class Smells:
     """
     A class to represent a smell struct.
     Parameters that will be used in the smell structure:
@@ -17,7 +17,14 @@ class AntiPattern:
         self.additional_info = {}
 
 
-# Dictionaries and Lists params for the smells
+# Dictionaries and lists of variables and params for the smells
+PROMPTS = {
+            "conditions": "Analyze the following condition for potential issues:\n\n",
+            "vulnerabilities": "Analyze the following content for potential vulnerabilities:\n\n",
+            "workflow_dispatch": "Analyze the following workflow dispatch for potential issues:\n\n",
+            "global_variables": "Analyze the following global variable for potential issues:\n\n"
+        }
+
 SEVERITIES = {
     "CodeDuplicity": {
         "severity": "Medium",
@@ -118,3 +125,5 @@ KEYWORDS = [
     "iv",
     "cipher"
 ]
+
+
