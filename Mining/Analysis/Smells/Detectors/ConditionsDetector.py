@@ -1,9 +1,9 @@
 import re
 from Mining.Analysis.DataStruct.Smells import Smells, SEVERITIES
 from Mining.Analysis.Utils.Utilities import Utility
-from Mining.Analysis.Smells.Strategies.ConditionalST import AlwaysTrueConditionCheckStrategy, \
-    AlwaysFalseConditionCheckStrategy, ComplexConditionCheckStrategy, UnnecessaryConditionCheckStrategy, \
-    InvalidReferenceCheckStrategy
+from Mining.Analysis.Smells.Strategies.ConditionalST import (ComplexConditionCheckStrategy,
+                                                             UnnecessaryConditionCheckStrategy,
+                                                             InvalidReferenceCheckStrategy)
 
 
 class ConditionsDetector:
@@ -11,8 +11,6 @@ class ConditionsDetector:
         self.workflow = workflow
         self.severity = SEVERITIES
         self.strategies = {
-            "AlwaysTrue": AlwaysTrueConditionCheckStrategy(),
-            "AlwaysFalse": AlwaysFalseConditionCheckStrategy(),
             "ComplexCondition": ComplexConditionCheckStrategy(),
             "UnnecessaryCondition": UnnecessaryConditionCheckStrategy(),
             "InvalidReference": InvalidReferenceCheckStrategy()

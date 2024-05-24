@@ -1,18 +1,22 @@
 import re
 from Mining.Analysis.DataStruct import Smells
-from Mining.Analysis.Smells.Strategies.CodeQualitiesSt import DuplicatedCodeCheckStrategy, LongCodeBlockCheckStrategy, \
-    GlobalsCheckStrategy
+from Mining.Analysis.Smells.Strategies.CodeQualitiesSt import (
+    DuplicatedCodeCheckStrategy,
+    LongCodeBlockCheckStrategy,
+    DuplicatedStepsCheckStrategy
+)
 from Mining.Analysis.Utils.Utilities import Utility
 
 
 class CodeQualityDetector:
     def __init__(self, workflow):
         self.workflow = workflow
-        self.severity = AntiPattern.SEVERITIES
+        self.severity = Smells.SEVERITIES
         self.strategies = {
             "CodeDuplicity": DuplicatedCodeCheckStrategy(),
             "LongCodeBlock": LongCodeBlockCheckStrategy(),
-            "Globals": GlobalsCheckStrategy()
+            "DuplicatedSteps": DuplicatedStepsCheckStrategy(),
+
         }
 
     def detect(self):
@@ -28,7 +32,7 @@ class CodeQualityDetector:
                 for issue_type, issues in code_quality_issues.items():
                     for issue in issues:
                         line_numbers = Utility.find_pattern(self.workflow.raw_content, re.escape(issue))
-                        anti_pattern = AntiPattern.AntiPattern()
+                        anti_pattern = Smells.Smells()
                         anti_pattern.type = issue_type
                         anti_pattern.description = issue
                         anti_pattern.location = f"{job.name}:{line_numbers[0] if line_numbers else 'Unknown'}"

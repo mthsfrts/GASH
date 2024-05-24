@@ -35,7 +35,7 @@ class LLMAnalyzer:
             gpt2_result = self.generate_gpt2_response(condition, self.prompts['conditions'])
 
             consensus_score = (bert_result[0]['score'] + roberta_result[0]['score'] + xlnet_result[0]['score'] +
-                               extract_gpt2_score(gpt2_result)) / 4
+                               self.extract_gpt2_score(gpt2_result)) / 4
             if bert_result[0]['label'] == 'LABEL_CONDITION':
                 smells.append({
                     'condition': condition,
@@ -58,7 +58,7 @@ class LLMAnalyzer:
             gpt2_result = self.generate_gpt2_response(line, self.prompts['vulnerabilities'])
 
             consensus_score = (roberta_result[0]['score'] + xlnet_result[0]['score'] +
-                               extract_gpt2_score(gpt2_result)) / 3
+                               self.extract_gpt2_score(gpt2_result)) / 3
             if roberta_result[0]['label'] == 'LABEL_VULNERABILITY':
                 vulnerabilities.append({
                     'line': line,
@@ -81,7 +81,7 @@ class LLMAnalyzer:
             gpt2_result = self.generate_gpt2_response(content, self.prompts['workflow_dispatch'])
 
             consensus_score = (bert_result[0]['score'] + roberta_result[0]['score'] + xlnet_result[0]['score']
-                               + extract_gpt2_score(gpt2_result)) / 4
+                               + self.self.extract_gpt2_score(gpt2_result)) / 4
             if bert_result[0]['label'] == 'LABEL_DISPATCH':
                 smells.append({
                     'description': 'Workflow dispatch found',
@@ -102,7 +102,7 @@ class LLMAnalyzer:
             gpt_result = self.generate_gpt2_response(line, self.prompts['global_variables'])
             xlnet_result = self.xlnet_pipeline(line)
 
-            consensus_score = (extract_gpt2_score(gpt_result) + xlnet_result[0]['score']) / 2
+            consensus_score = (self.extract_gpt2_score(gpt_result) + xlnet_result[0]['score']) / 2
             if "global variable" in gpt_result:
                 global_vars.append({
                     'variable': line,

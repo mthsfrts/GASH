@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 import re
 from Mining.Analysis.DataStruct.Smells import GENERIC_NAMES, KEYWORDS
-from Mining.Analysis.Utils.LLMs import LLMAnalyzer
+from Mining.Analysis.LLMs.LLMs import LLMAnalyzer
 
 
 class ConditionCheckStrategy(ABC):
@@ -10,23 +10,9 @@ class ConditionCheckStrategy(ABC):
         pass
 
 
-class AlwaysTrueConditionCheckStrategy(ConditionCheckStrategy):
-    def check(self, condition):
-        if 'true' in condition:
-            return True
-        return False
-
-
-class AlwaysFalseConditionCheckStrategy(ConditionCheckStrategy):
-    def check(self, condition):
-        if 'false' in condition:
-            return True
-        return False
-
-
 class ComplexConditionCheckStrategy(ConditionCheckStrategy):
-    def __init__(self, llm_analyzer):
-        self.llm_analyzer = llm_analyzer
+    def __init__(self):
+        self.llm_analyzer = LLMAnalyzer()
 
     def check(self, script):
         issues = []
@@ -48,8 +34,10 @@ class ComplexConditionCheckStrategy(ConditionCheckStrategy):
         conditions = script.split('\n')
 
         for condition in conditions:
-            llm_issues = self.llm_analyzer.analyze_conditions(condition)
-            issues.extend(llm_issues)
+            llm_issues = self.llm_analyzer.conditions(condition)
+            for issue in llm_issues:
+                issue_score = self.llm_analyzer.extract_gpt2_score(issue['response'])
+                issues.append({'issue': issue, 'score': issue_score})
 
         return issues
 
@@ -67,8 +55,8 @@ class UnnecessaryConditionCheckStrategy(ConditionCheckStrategy):
 
 
 class InvalidReferenceCheckStrategy(ConditionCheckStrategy):
-    def __init__(self, llm_analyzer):
-        self.llm_analyzer = llm_analyzer
+    def __init__(self):
+        self.llm_analyzer = LLMAnalyzer()
 
     def check(self, script):
         issues = []
@@ -90,7 +78,7 @@ class InvalidReferenceCheckStrategy(ConditionCheckStrategy):
         conditions = script.split('\n')
 
         for condition in conditions:
-            llm_issues = self.llm_analyzer.analyze_conditions(condition)
+            llm_issues = self.llm_analyzer.conditions(condition)
             for issue in llm_issues:
                 issue_score = self.llm_analyzer.extract_gpt2_score(issue['response'])
                 issues.append({'issue': issue, 'score': issue_score})

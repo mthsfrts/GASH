@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import re
 
 
 class CodeQualityCheckStrategy(ABC):
@@ -27,11 +28,14 @@ class LongCodeBlockCheckStrategy(CodeQualityCheckStrategy):
         return issues
 
 
-class GlobalsCheckStrategy(CodeQualityCheckStrategy):
-    def check(self, script):
+class DuplicatedStepsCheckStrategy(CodeQualityCheckStrategy):
+    def check(self, workflow):
         issues = []
-        for line in script.split('\n'):
-            if line.startswith("global "):
-                variable_name = line.split(" ")[1]
-                issues.append(variable_name)
+        step_signatures = set()
+        for job in workflow.jobs:
+            for step in job.steps:
+                step_signature = (step.name, step.command)
+                if step_signature in step_signatures:
+                    issues.append(f"Duplicated step: {step.name} with command: {step.command}")
+                step_signatures.add(step_signature)
         return issues

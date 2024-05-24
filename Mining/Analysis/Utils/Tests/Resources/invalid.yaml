@@ -1,0 +1,146 @@
+name: Invalid Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # Hardcoded
+    env:
+      GLOBAL_VAR: "this is a global variable"
+      API_KEY: "super_secretkey"
+      generated: "generic variable name"
+      SOME_KEY: "value"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Long code block
+      - name: Long script
+        run: |
+          echo "Line 1"
+          echo "Line 2"
+          echo "Line 3"
+          echo "Line 4"
+          echo "Line 5"
+          echo "Line 6"
+          echo "Line 7"
+          echo "Line 8"
+          echo "Line 9"
+          echo "Line 10"
+          echo "Line 11"
+          echo "Line 12"
+          echo "Line 13"
+          echo "Line 14"
+          echo "Line 15"
+          echo "Line 16"
+          echo "Line 17"
+          echo "Line 18"
+          echo "Line 19"
+          echo "Line 20"
+          echo "Line 21"
+
+      # Duplicated code block
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          echo "Running tests..."
+
+      # Globals redefinition
+      - name: Define global variable
+        env:
+          GLOBAL_VAR: "this is a new value"
+        run: |
+          echo ${{ env.GLOBAL_VAR }}
+
+      # Duplicated steps
+      - name: Run tests
+        run: |
+          echo "Running tests..."
+          echo "Running tests..."
+
+      # Complex condition
+      - name: Complex condition
+        if: ${{ github.ref == 'refs/heads/main' && github.actor == 'user' }}
+        run: echo "This is a complex condition"
+
+      # Nested condition
+      - name: Nested condition
+        if: ${{ github.ref == 'refs/heads/develop' }}
+        run: echo "First condition"
+
+      - name: Another nested condition
+        if: ${{ github.event_name == 'push' }}
+        run: echo "Second condition"
+
+      # Invalid secret reference
+      - name: Invalid secret reference
+        if: ${{ secrets.INVALID_SECRET }}
+        run: echo "Using an invalid secret reference"
+
+      # Continue on error
+      - name: Continue on error
+        run: exit 1
+        continue-on-error: true
+
+      # Retry logic
+      - name: Retry step
+        run: exit 1
+        retry: 3
+
+      # Workflow dispatch
+      - name: Manual trigger
+        uses: actions/github-script@v3
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'workflow.yml',
+              ref: 'main'
+            })
+
+      # Excessive global variables
+      - name: Excessive global variables
+        env:
+          EXCESSIVE_VAR1: "value1"
+          EXCESSIVE_VAR2: "value2"
+          EXCESSIVE_VAR3: "value3"
+          EXCESSIVE_VAR4: "value4"
+          EXCESSIVE_VAR5: "value5"
+          EXCESSIVE_VAR6: "value6"
+          EXCESSIVE_VAR7: "value7"
+          EXCESSIVE_VAR8: "value8"
+          EXCESSIVE_VAR9: "value9"
+          EXCESSIVE_VAR10: "value10"
+          EXCESSIVE_VAR11: "value11"
+        run: |
+          echo "This job has too many global variables "
+
+      # Generic variable names
+      - name: Generic variable names
+        env:
+          generated: "This is a generic variable value"
+        run: |
+          echo "Using a generic variable value"
+
+      # Exposing sensitive information directly
+      - name: Expose API Key
+        run: echo "API Key = ${{ env.API_KEY }}"
+
+      - name: Expose Secret Var
+        run: echo "Secret Var = ${{ env.SECRET_VAR }}"
+
+      - name: Expose Database Password
+        run: echo "Database Password = ${{ env.DATABASE_PASSWORD }}"
+
+      # Sensitive information in variable names
+      - name: Expose sensitive information
+        env:
+          SENSITIVE_INFO: "sensitive data"
+        run: echo "Sensitive Info = ${{ env.SENSITIVE_INFO }}"
