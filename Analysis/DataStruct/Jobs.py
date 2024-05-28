@@ -22,14 +22,13 @@ class Job:
         needs (list): Dependencies of the job.
         uses (list): Actions that the job uses.
         with_params (dict): Parameters for the job.
-        raw (dict): The raw representation of the job.
     """
 
     def __init__(self):
         self.name = None
         self._id = None
         self.runs_on = None
-        self.steps = {}
+        self.steps = []
         self.env = {}
         self._if = None
         self.concurrency = None
@@ -45,10 +44,9 @@ class Job:
         self.needs = []
         self.uses = None
         self.with_params = {}
-        self.raw = {}
 
     def __str__(self):
-        return (f"Job("
+        return (f"Job :"
                 f"Name = {self.name},\n"
                 f"Id = {self._id},\n"
                 f"Runs_on = {self.runs_on},\n"
@@ -67,5 +65,4 @@ class Job:
                 f"Timeout_Minutes = {self.timeout_minutes},\n"
                 f"Needs = {self.needs},\n"
                 f"Uses = {self.uses},\n"
-                f"With = {self.with_params},\n"
-                f"Raw = {self.raw})")
+                f"With = {self.with_params}")

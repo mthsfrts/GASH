@@ -1,0 +1,18 @@
+# files/service_test.yaml
+name: Service Workflow
+on: [push]
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        env:
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/test
+        run: pytest

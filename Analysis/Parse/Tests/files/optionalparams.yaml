@@ -1,0 +1,11 @@
+    name: Workflow with Optional Params
+    on: push
+    jobs:
+      test_job:
+        runs-on: ubuntu-latest
+        concurrency: group-1
+        permissions:
+          actions: read
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2

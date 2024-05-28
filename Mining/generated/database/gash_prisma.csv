@@ -18654,7 +18654,7 @@ prisma,Sergey Tatarintsev,User,tatarintsev@prisma.io,GitHub,User,noreply@github.
 * ci: Improve daily builds/CI workflows
 
 1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -18662,7 +18662,7 @@ all"" comment now will be done only in CI workflow. Scheduled jobs
 will autoamtically build everything.
 
 * Review",5,4.14.0,daily-buildpulse.yml,MODIFY,2,1,,19132,SevInf,User,CONTRIBUTOR,SevInf,User,2023-05-08T09:18:44Z,2023-05-08T15:13:51Z,closed,,,,"1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -18684,7 +18684,7 @@ prisma,Sergey Tatarintsev,User,tatarintsev@prisma.io,GitHub,User,noreply@github.
 * ci: Improve daily builds/CI workflows
 
 1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -18692,7 +18692,7 @@ all"" comment now will be done only in CI workflow. Scheduled jobs
 will autoamtically build everything.
 
 * Review",5,4.14.0,daily-test.yml,MODIFY,2,1,,19132,SevInf,User,CONTRIBUTOR,SevInf,User,2023-05-08T09:18:44Z,2023-05-08T15:13:51Z,closed,,,,"1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -18717,7 +18717,7 @@ prisma,Sergey Tatarintsev,User,tatarintsev@prisma.io,GitHub,User,noreply@github.
 * ci: Improve daily builds/CI workflows
 
 1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -18725,7 +18725,7 @@ all"" comment now will be done only in CI workflow. Scheduled jobs
 will autoamtically build everything.
 
 * Review",5,4.14.0,test-template.yml,ADD,1372,0,,19132,SevInf,User,CONTRIBUTOR,SevInf,User,2023-05-08T09:18:44Z,2023-05-08T15:13:51Z,closed,,,,"1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -20109,7 +20109,7 @@ prisma,Sergey Tatarintsev,User,tatarintsev@prisma.io,GitHub,User,noreply@github.
 * ci: Improve daily builds/CI workflows
 
 1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test
@@ -20117,7 +20117,7 @@ all"" comment now will be done only in CI workflow. Scheduled jobs
 will autoamtically build everything.
 
 * Review",5,4.14.0,test.yml,MODIFY,6,1352,,19132,SevInf,User,CONTRIBUTOR,SevInf,User,2023-05-08T09:18:44Z,2023-05-08T15:13:51Z,closed,,,,"1. Splits most of the workflow in a separate reusable template
-file. This allows us to safely use defaults of workflow inputs
+file. This allows us to safely use defaults.yaml of workflow inputs
 regardless of the reasons workflow got triggered and don't think about
 fallback every time we need to use the input.
 2. ""Detect jobs to run"" step, as well as the attempt to find ""ci test

@@ -129,7 +129,7 @@ Aqui está uma tabela resumida das configurações possíveis em cada nível, em
 | concurrency       | ✔️       | ✔️  |      |
 | container         |          | ✔️  |      |
 | continue-on-error |          | ✔️  | ✔️   |
-| defaults          | ✔️       |     |      |
+| defaults          | ✔️       | ✔️  |      |
 | env               | ✔️       | ✔️  | ✔️   |
 | fail-fast         |          | ✔️  |      |
 | if                |          |     | ✔️   |

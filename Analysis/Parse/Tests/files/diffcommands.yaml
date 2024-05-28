@@ -1,0 +1,14 @@
+    name: Workflow with Different Commands
+    on: push
+    jobs:
+      test_job:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Checkout code
+            uses: actions/checkout@v2
+          - name: Run tests
+            run: pytest
+          - name: Set up environment
+            env:
+              TEST_VAR: test_value
+            run: echo $TEST_VAR
