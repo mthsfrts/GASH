@@ -12,10 +12,10 @@ from os.path import dirname, abspath
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
 
-import Mining.Analysis.Parse.GHYamlParse as GHYamlParse
-from Mining.Analysis.Smells.Detectors import WorkflowDispatchDetector as Wd, RetriesDetectors as Retries, \
-    GlobalsDetector as Globals, VulnerabilityDetector as Vulnerability, ContinuesOnErrorDetector as CoE, \
-    CodeQualityDetector as Cq, ConditionsDetector as Conditionals
+import Analysis.Parse.GHYamlParse as GHYamlParse
+from Analysis.Smells.Detectors import WorkflowDispatchDetector as Wd, ContinuesOnErrorDetector as CoE, \
+    GlobalsDetector as Globals, RetriesDetectors as Retries, CodeQualityDetector as Cq, \
+    ConditionsDetector as Conditionals, VulnerabilityDetector as Vulnerability
 
 
 class Utils:

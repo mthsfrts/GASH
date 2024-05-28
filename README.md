@@ -1,386 +1,357 @@
+# GitHub Actions Syntax
+
+## Estrutura de Configurações do GitHub Actions
+No GitHub Actions, a configuração de workflows é feita em três níveis: **workflow**, **job** e **step**. Abaixo está uma descrição detalhada das configurações possíveis em cada nível.
+
+### Workflow
+
+No nível do workflow, você define configurações gerais que se aplicam a todo o fluxo de trabalho:
+
+```yaml
+name: [workflow_name]
+
+on:
+  [push|pull_request|schedule|workflow_dispatch|workflow_call]: ...
+  workflow_call:
+    secrets:
+      SECRET_NAME:
+ required: true
+
+env: # Variáveis de ambiente globais
+  GLOBAL_VAR: value
+
+defaults: # Configurações padrão para todos os jobs e steps
+  run:
+    shell: bash
+    working-directory: scripts
+
+inputs: # Entradas para o workflow (especialmente com workflow_dispatch e workflow_call)
+  input_name:
+    description: 'Description of the input'
+    required: true
+    default: 'default_value'
+    type: string
+
+outputs: # Saídas do workflow
+  output_name: ${{ jobs.job_id.outputs.output_name }}
+
+concurrency: # Limitar a execução simultânea de workflows
+  group: workflow-group
+  cancel-in-progress: true
+
+permissions: # Permissões do GITHUB_TOKEN
+  actions: read
+  contents: read
+```
+
+### Job
+
+O nível do job define um conjunto de steps que são executados em um ambiente específico:
+
+```yaml
+jobs:
+  [job_id]:
+    name: [job_name]
+    runs-on: [runner]
+    needs: [job_id]
+    env: # Variáveis de ambiente específicas para o job
+      JOB_VAR: value
+    secrets: # Segredos específicos para o job
+      SECRET_VAR: ${{ secrets.SECRET_NAME }}
+    strategy:
+      matrix: ...
+      fail-fast: true
+      max-parallel: 2
+    concurrency: # Limitar a execução simultânea de jobs
+      group: job-group
+      cancel-in-progress: true
+    steps: ...
+    outputs: # Saídas do job, podem ser usadas por outros jobs
+      output_id: ${{ steps.step_id.outputs.output_name }}
+    timeout-minutes: [minutes]
+    continue-on-error: [true|false]
+    container: # Container Docker para executar o job
+      image: [docker_image]
+    services: # Serviços adicionais para o job (por exemplo, banco de dados)
+      [service_name]: ...
+    retries: # Configuração de reexecução do job
+      max-attempts: [number]
+    permissions: # Permissões do GITHUB_TOKEN para o job
+      actions: read
+      contents: read
+    status-check: # Checks de status
+      status: [success|failure|cancelled|skipped|timed_out|completed]
+    artifacts: # Artefatos para upload/download
+      upload:
+       name: [artifact_name]
+       path: [file_or_directory]
+    download:
+       name: [artifact_name]
+       path: [destination_path]
+```
+
+### Step
+
+O nível da step define ações ou comandos individuais a serem executados:
+
+```yaml
+steps:
+  - name: [step_name]
+    id: [step_id]
+    if: [conditional]
+    run: [command]
+    uses: [action]
+    with: ...
+    env: # Variáveis de ambiente específicas para a step
+      STEP_VAR: value
+    continue-on-error: [true|false]
+    timeout-minutes: [minutes]
+    working-directory: [directory]
+    retries: # Configuração de reexecução da step
+      max-attempts: [number]
+    status: [success|failure|cancelled|skipped|timed_out|completed]
+    artifacts: # Artefatos para upload/download
+      upload:
+       name: [artifact_name]
+       path: [file_or_directory]
+    download:
+       name: [artifact_name]
+       path: [destination_path]
+```
+
+### Resumo das Configurações
+
+Aqui está uma tabela resumida das configurações possíveis em cada nível, em ordem alfabética:
+
+| Configuração      | Workflow | Job | Step |
+|-------------------|----------|-----|------|
+| artifacts         |          | ✔️  | ✔️   |
+| concurrency       | ✔️       | ✔️  |      |
+| container         |          | ✔️  |      |
+| continue-on-error |          | ✔️  | ✔️   |
+| defaults          | ✔️       |     |      |
+| env               | ✔️       | ✔️  | ✔️   |
+| fail-fast         |          | ✔️  |      |
+| if                |          |     | ✔️   |
+| inputs            | ✔️       |     |      |
+| jobs              | ✔️       |     |      |
+| max-parallel      |          | ✔️  |      |
+| name              | ✔️       | ✔️  | ✔️   |
+| needs             |          | ✔️  |      |
+| on                | ✔️       |     |      |
+| outputs           | ✔️       | ✔️  |      |
+| permissions       | ✔️       | ✔️  |      |
+| retries           |          | ✔️  | ✔️   |
+| run               |          |     | ✔️   |
+| runs-on           |          | ✔️  |      |
+| secrets           | ✔️       | ✔️* |      |
+| services          |          | ✔️  |      |
+| steps             |          | ✔️  | ✔️   |
+| strategy          |          | ✔️  |      |
+| timeout-minutes   | ✔️       | ✔️  | ✔️   |
+| uses              |          | ✔️  | ✔️   |
+| with              |          | ✔️  | ✔️   |
+| working-directory |          |     | ✔️   |
+
+*Note: `secrets` no nível do job está em beta.
+
+Essas configurações são baseadas nas informações das documentações oficiais do GitHub Actions:
+- [Workflow syntax for GitHub Actions](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions)
+- [Contexts](https://docs.github.com/en/actions/learn-github-actions/contexts)
+- [Variables](https://docs.github.com/en/actions/security-guides/encrypted-secrets)
+- [Workflow commands](https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions)
+- [Guides for GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/guides-for-github-actions)
+
 # Smells para GitHub Actions
+### Resumo dos Smells
 
 ### Categoria: Segurança
 
 #### [ ] 1. **Hard-coded Secrets**
-
 - **Estratégia:** Verificar a presença de segredos diretamente nos arquivos YAML.
-- **Impacto:** Crítico
 - **Descrição:** Segredos e credenciais armazenados diretamente no código, expondo dados sensíveis.
 - **Mitigação:** Utilizar GitHub Secrets para armazenar informações sensíveis.
 - **Grau de Vulnerabilidade:** Crítico
-    - **Justificativa:** Exposição de credenciais pode levar a comprometimentos graves de segurança.
+  - **Justificativa:** Exposição de credenciais pode levar a comprometimentos graves de segurança.
 
 #### [ ] 2. **Inefficient Use of Fail-Fast and Continue-on-Error**
-
-- **Estratégia:** Verificar a configuração de `fail-fast` e `continue-on-error` para garantir que sejam usadas
-  corretamente.
-- **Impacto:** Médio
+- **Estratégia:** Verificar a configuração de `fail-fast` e `continue-on-error` para garantir que sejam usadas corretamente.
 - **Descrição:** Configurações que podem levar a execuções desnecessárias ou mascarar falhas.
-- **Mitigação:** Usar `fail-fast` e `continue-on-error` de forma adequada para garantir execuções eficientes e
-  transparentes.
+- **Mitigação:** Usar `fail-fast` e `continue-on-error` de forma adequada para garantir execuções eficientes e transparentes.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Pode mascarar problemas ou causar execuções desnecessárias, aumentando a complexidade de
-      depuração.
+  - **Justificativa:** Pode mascarar problemas ou causar execuções desnecessárias, aumentando a complexidade de depuração.
 
 #### [ ] 3. **Retry Failure**
-
 - **Estratégia:** Identificar reexecuções automáticas que mascaram problemas reais.
-- **Impacto:** Médio
 - **Descrição:** Reexecuções automáticas que podem esconder problemas intermitentes.
 - **Mitigação:** Investigar e corrigir as causas subjacentes das falhas em vez de reexecutar automaticamente.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Pode mascarar problemas que afetam a confiabilidade do sistema.
+  - **Justificativa:** Pode mascarar problemas que afetam a confiabilidade do sistema.
 
 #### [ ] 4. **Deprecated or Unsafe Libraries**
-
 - **Estratégia:** Verificar o uso de bibliotecas desatualizadas ou conhecidamente inseguras.
-- **Impacto:** Médio
 - **Descrição:** Uso de bibliotecas que não recebem mais atualizações ou que têm vulnerabilidades conhecidas.
 - **Mitigação:** Manter as bibliotecas atualizadas e usar ferramentas de análise de dependências.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Pode introduzir vulnerabilidades conhecidas no sistema.
+  - **Justificativa:** Pode introduzir vulnerabilidades conhecidas no sistema.
 
 #### [ ] 5. **Flaky Tests**
-
 - **Estratégia:** Detectar testes que falham de maneira intermitente.
-- **Impacto:** Médio
 - **Descrição:** Testes que falham aleatoriamente, causando incerteza nos resultados.
 - **Mitigação:** Identificar e corrigir a causa raiz da flakiness dos testes.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Reduz a confiança nos resultados dos testes.
+  - **Justificativa:** Reduz a confiança nos resultados dos testes.
 
 ### Categoria: Manutenção
 
-#### [ ] 1. **Fuzzy Version**
+#### [ ] 1. **Push Event Misconfiguration**
+- **Estratégia:** Verificar configurações de push associadas a branches e tags.
+- **Descrição:** Má configuração dos eventos de push, como ausência de filtros para branches ou tags específicas.
+- **Mitigação:** Usar filtros apropriados para branches e tags.
+- **Grau de Vulnerabilidade:** Médio
+  - **Justificativa:** Pode levar à execução desnecessária de workflows e aumentar a carga do CI/CD.
 
+#### [ ] 2. **Pull Request Event Misconfiguration**
+- **Estratégia:** Verificar configurações de pull request associadas a branches específicas.
+- **Descrição:** Má configuração dos eventos de pull request, como falta de filtros para branches específicas ou condições de merge.
+- **Mitigação:** Usar filtros apropriados para branches e condições de merge.
+- **Grau de Vulnerabilidade:** Médio
+  - **Justificativa:** Pode levar à execução desnecessária de workflows e a possíveis conflitos de merge.
+
+#### [ ] 3. **Release Event Misconfiguration**
+- **Estratégia:** Verificar configurações de release associadas a versões específicas.
+- **Descrição:** Má configuração dos eventos de release, como ausência de filtros para versões específicas ou prereleases.
+- **Mitigação:** Usar filtros apropriados para versões e prereleases.
+- **Grau de Vulnerabilidade:** Médio
+  - **Justificativa:** Pode levar à execução desnecessária de workflows e a lançamento incorreto de versões.
+
+#### [ ] 4. **Workflow Dispatch Misconfiguration**
+- **Estratégia:** Verificar a configuração de inputs no evento de dispatch manual.
+- **Descrição:** Má configuração dos inputs fornecidos manualmente no evento de dispatch.
+- **Mitigação:** Validar e documentar claramente os inputs necessários para o dispatch manual.
+- **Grau de Vulnerabilidade:** Médio
+  - **Justificativa:** Inputs incorretos podem levar à execução inadequada de workflows e falhas na execução.
+
+#### [ ] 5. **Workflow Call Misconfiguration**
+- **Estratégia:** Verificar a configuração de chamadas de outros workflows.
+- **Descrição:** Má configuração de chamadas remotas de outros workflows, como falta de validação de parâmetros.
+- **Mitigação:** Validar e documentar claramente os parâmetros passados nas chamadas de workflows.
+- **Grau de Vulnerabilidade:** Médio
+  - **Justificativa:** Chamadas incorretas podem levar a falhas de execução e dependências não resolvidas.
+
+#### [ ] 6. **Run Event Misconfiguration**
+- **Estratégia:** Verificar a configuração do evento de run baseado no status de outros workflows.
+- **Descrição:** Má configuração do evento de run, como dependências incorretas ou status de execução não configurados adequadamente.
+- **Mitigação:** Configurar corretamente as dependências e status de execução.
+- **Grau de Vulnerabilidade:** Médio
+  - **Justificativa:** Dependências incorretas podem levar a execuções desnecessárias ou falhas na execução.
+
+#### [ ] 7. **Fuzzy Version**
 - **Estratégia:** Detectar versões imprecisas ou ausentes em dependências.
-- **Impacto:** Médio
 - **Descrição:** Uso de versões não específicas para dependências, dificultando a reprodução de builds.
 - **Mitigação:** Especificar versões exatas para todas as dependências.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Pode levar a inconsistências e dificuldades na manutenção.
+  - **Justificativa:** Pode levar a inconsistências e dificuldades na manutenção.
 
-#### [ ] 2. **Untracked Artifacts**
-
+#### [ ] 8. **Untracked Artifacts**
 - **Estratégia:** Verificar se artefatos são gerados sem controle de versão.
-- **Impacto:** Médio
 - **Descrição:** Artefatos gerados que não são rastreados ou versionados, dificultando a reprodução.
 - **Mitigação:** Implementar controle de versão para todos os artefatos.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Dificulta a reprodução e manutenção do ambiente de build.
+  - **Justificativa:** Dificulta a reprodução e manutenção do ambiente de build.
 
-#### [ ] 3. **Inefficient Cache Management**
-
+#### [ ] 9. **Inefficient Cache Management**
 - **Estratégia:** Verificar o uso correto e invalidação de caches.
-- **Impacto:** Pequeno
 - **Descrição:** Cache mal gerenciado que não é reutilizado ou cresce desnecessariamente.
 - **Mitigação:** Configurar corretamente as chaves de cache e limpar caches regularmente.
 - **Grau de Vulnerabilidade:** Pequeno
-    - **Justificativa:** Impacta a eficiência, mas não compromete diretamente a segurança ou a funcionalidade.
+  - **Justificativa:** Impacta a eficiência, mas não compromete diretamente a segurança ou a funcionalidade.
 
-#### [ ] 4. **Inadequate Logging**
-
+#### [ ] 10. **Inadequate Logging**
 - **Estratégia:** Verificar logs para presença de dados sensíveis ou excesso de informações.
-- **Impacto:** Médio
 - **Descrição:** Logs que expõem dados sensíveis ou são muito verbosos.
 - **Mitigação:** Utilizar `::add-mask::` para mascarar dados sensíveis e adotar práticas de logging padrão.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Pode expor dados sensíveis e dificultar a depuração.
+  - **Justificativa:** Pode expor dados sensíveis e dificultar a depuração.
 
-#### [ ] 5. **Complex Event Triggers (Triggers de Eventos Complexos)**
-
+#### [ ] 11. **Complex Event Triggers**
 - **Estratégia:** Verificar o uso de múltiplos triggers e a complexidade na configuração de eventos.
-- **Impacto:** Médio
 - **Descrição:** Configurações complexas de eventos que podem causar execuções indesejadas ou desnecessárias.
 - **Mitigação:** Simplificar a configuração de eventos e documentar claramente a lógica de triggers.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Aumenta a complexidade e pode levar a execuções inesperadas.
+  - **Justificativa:** Aumenta a complexidade e pode levar a execuções inesperadas.
 
-#### [ ] 6. **Improper Use of Matrix Strategy**
-
+#### [ ] 12. **Improper Use of Matrix Strategy**
 - **Estratégia:** Verificar a configuração da matriz para variações desnecessárias ou excessivas.
-- **Impacto:** Médio
 - **Descrição:** Configurações de matriz que criam variações redundantes ou desnecessárias de jobs.
 - **Mitigação:** Otimizar a configuração da matriz para evitar execuções redundantes.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Aumenta o tempo de execução e o uso de recursos.
+  - **Justificativa:** Aumenta o tempo de execução e o uso de recursos.
 
-#### [ ] 7. **Convoluted Conditions (Condições Convolutas)**
-
+#### [ ] 13. **Convoluted Conditions**
 - **Estratégia:** Verificar o uso de condições complexas (`if`, `with`, `needs`, etc.) que podem ser simplificadas.
-- **Impacto:** Médio
 - **Descrição:** Uso de condições complexas que podem dificultar a leitura e manutenção do workflow.
 - **Mitigação:** Simplificar condições e documentar claramente a lógica condicional.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Aumenta a complexidade e pode introduzir erros difíceis de depurar.
+  - **Justificativa:** Aumenta a complexidade e pode introduzir erros difíceis de depurar.
 
-#### [ ] 8. **Misuse of Execution Status Checks (always, canceled, success)**
-
+#### [ ] 14. **Misuse of Execution Status Checks**
 - **Estratégia:** Verificar o uso correto de verificações de status de execução (`always`, `canceled`, `success`).
-- **Impacto:** Médio
 - **Descrição:** Uso inadequado de verificações de status que podem causar execuções indesejadas ou ignorar falhas.
 - **Mitigação:** Configurar corretamente as verificações de status para garantir execuções adequadas.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Pode levar a execuções indesejadas ou mascarar falhas importantes.
+  - **Justificativa:** Pode levar a execuções indesejadas ou mascarar falhas importantes.
 
-#### [ ] 9. **Bash Script Complexity**
-
+#### [ ] 15. **Bash Script Complexity**
 - **Estratégia:** Verificar scripts bash longos e complexos dentro dos steps.
-- **Impacto:** Médio
 - **Descrição:** Scripts bash complexos que podem ser difíceis de manter e depurar.
 - **Mitigação:** Dividir scripts complexos em partes menores e mais gerenciáveis e adicionar comentários explicativos.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Dificulta a manutenção e aumenta a possibilidade de erros.
+  - **Justificativa:** Dificulta a manutenção e aumenta a possibilidade de erros.
 
 ### Categoria: Eficiência
 
 #### [ ] 1. **Long Build Times**
-
 - **Estratégia:** Monitorar o tempo de execução dos builds e identificar etapas que causam lentidão.
-- **Impacto:** Médio
 - **Descrição:** Builds que demoram muito tempo, impactando a produtividade.
 - **Mitigação:** Otimizar os passos do build e usar caching eficazmente.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Impacta a produtividade, mas não compromete diretamente a segurança ou a funcionalidade.
+  - **Justificativa:** Impacta a produtividade, mas não compromete diretamente a segurança ou a funcionalidade.
 
 #### [ ] 2. **Excessive Privileges**
-
 - **Estratégia:** Verificar permissões configuradas nos workflows.
-- **Impacto:** Crítico
 - **Descrição:** Permissões excessivas configuradas nos workflows que podem levar a riscos de segurança.
 - **Mitigação:** Restringir permissões aos mínimos necessários.
-- **Grau de Vulnerabilidade:** Crítico
-    - **Justificativa:** Permissões excessivas podem levar a comprometimentos graves de segurança.
+- **Vulnerabilidade:** 
+  - **Grau:** Crítico
+  - **Justificativa:** Permissões excessivas podem levar a comprometimentos graves de segurança.
 
 ### Categoria: Qualidade
 
 #### [ ] 1. **Typos and Generic Words**
-
-- **Estratégia:** Verificar nomes de jobs, steps e variáveis para identificar erros de digitação comuns ou termos muito
-  genéricos.
-- **Impacto:** Pequeno
+- **Estratégia:** Verificar nomes de jobs, steps e variáveis para identificar erros de digitação comuns ou termos muito genéricos.
 - **Descrição:** Erros de digitação e palavras genéricas que dificultam a compreensão do código.
 - **Mitigação:** Adotar convenções de nomenclatura claras e revisar o código regularmente.
 - **Grau de Vulnerabilidade:** Pequeno
-    - **Justificativa:** Impacta a legibilidade e manutenção, mas não compromete diretamente a segurança ou a
-      funcionalidade.
+  - **Justificativa:** Impacta a legibilidade e manutenção, mas não compromete diretamente a segurança ou a funcionalidade.
 
 #### [ ] 2. **Inconsistent Naming Conventions**
-
 - **Estratégia:** Verificar se nomes de jobs, steps e variáveis seguem convenções consistentes.
-- **Impacto:** Pequeno
 - **Descrição:** Convenções de nomenclatura inconsistentes que dificultam a leitura e manutenção.
 - **Mitigação:** Adotar e seguir convenções de nomenclatura claras.
 - **Grau de Vulnerabilidade:** Pequeno
-    - **Justificativa:** Impacta a legibilidade e manutenção, mas não compromete diretamente a segurança ou a
-      funcionalidade.
+  - **Justificativa:** Impacta a legibilidade e manutenção, mas não compromete diretamente a segurança ou a funcionalidade.
 
 #### [ ] 3. **Large Code Blocks**
-
 - **Estratégia:** Identificar steps que contêm scripts longos e complexos.
-- **Impacto:** Médio
 - **Descrição:** Blocos de código grandes que dificultam a leitura e manutenção.
 - **Mitigação:** Dividir scripts longos em partes menores e mais gerenciáveis.
 - **Grau de Vulnerabilidade:** Médio
-    - **Justificativa:** Impacta a legibilidade e manutenção, podendo levar a erros e dificuldades na depuração.
+  - **Justificativa:** Impacta a legibilidade e manutenção, podendo levar a erros e dificuldades na depuração.
 
 #### [ ] 4. **Lack of Comments and Documentation**
-
 - **Estratégia:** Verificar a presença de comentários explicativos e documentação adequada.
-- **Impacto:** Pequeno
 - **Descrição:** Falta de comentários e documentação nos workflows.
 - **Mitigação:** Adicionar comentários explicativos e manter a documentação atualizada.
 - **Grau de Vulnerabilidade:** Pequeno
-    - **Justificativa:** Impacta a legibilidade e manutenção, mas não compromete diretamente a segurança ou a
-      funcionalidade.
-
-# Smells for GitHub Actions
-
-### Category: Security
-
-#### [ ] 1. **Hard-coded Secrets**
-
-- **Strategy:** Check for secrets directly in YAML files.
-- **Impact:** Critical
-- **Description:** Secrets and credentials stored directly in the code, exposing sensitive information.
-- **Mitigation:** Use GitHub Secrets to store sensitive information.
-- **Vulnerability Level:** Critical
-    - **Justification:** Exposure of credentials can lead to severe security breaches.
-
-#### [ ] 2. **Inefficient Use of Fail-Fast and Continue-on-Error**
-
-- **Strategy:** Verify the configuration of `fail-fast` and `continue-on-error` to ensure they are used correctly.
-- **Impact:** Medium
-- **Description:** Configurations that can lead to unnecessary executions or mask failures.
-- **Mitigation:** Use `fail-fast` and `continue-on-error` appropriately to ensure efficient and transparent executions.
-- **Vulnerability Level:** Medium
-    - **Justification:** Can mask issues or cause unnecessary executions, increasing debugging complexity.
-
-#### [ ] 3. **Retry Failure**
-
-- **Strategy:** Identify automatic retries that mask real issues.
-- **Impact:** Medium
-- **Description:** Automatic retries that can hide intermittent issues.
-- **Mitigation:** Investigate and fix the underlying causes of failures instead of automatically retrying.
-- **Vulnerability Level:** Medium
-    - **Justification:** Can mask issues that affect the system's reliability.
-
-#### [ ] 4. **Deprecated or Unsafe Libraries**
-
-- **Strategy:** Check for the use of outdated or known unsafe libraries.
-- **Impact:** Medium
-- **Description:** Use of libraries that no longer receive updates or have known vulnerabilities.
-- **Mitigation:** Keep libraries updated and use dependency analysis tools.
-- **Vulnerability Level:** Medium
-    - **Justification:** Can introduce known vulnerabilities into the system.
-
-#### [ ] 5. **Flaky Tests**
-
-- **Strategy:** Detect tests that fail intermittently.
-- **Impact:** Medium
-- **Description:** Tests that fail randomly, causing uncertainty in results.
-- **Mitigation:** Identify and fix the root cause of flaky tests.
-- **Vulnerability Level:** Medium
-    - **Justification:** Reduces confidence in test results.
-
-### Category: Maintenance
-
-#### [ ] 1. **Fuzzy Version**
-
-- **Strategy:** Detect imprecise or missing versions in dependencies.
-- **Impact:** Medium
-- **Description:** Use of non-specific versions for dependencies, making build reproduction difficult.
-- **Mitigation:** Specify exact versions for all dependencies.
-- **Vulnerability Level:** Medium
-    - **Justification:** Can lead to inconsistencies and maintenance difficulties.
-
-#### [ ] 2. **Untracked Artifacts**
-
-- **Strategy:** Check if artifacts are generated without version control.
-- **Impact:** Medium
-- **Description:** Generated artifacts that are not tracked or versioned, making reproduction difficult.
-- **Mitigation:** Implement version control for all artifacts.
-- **Vulnerability Level:** Medium
-    - **Justification:** Makes reproducing and maintaining the build environment difficult.
-
-#### [ ] 3. **Inefficient Cache Management**
-
-- **Strategy:** Verify correct usage and invalidation of caches.
-- **Impact:** Low
-- **Description:** Poorly managed cache that is not reused or grows unnecessarily.
-- **Mitigation:** Configure cache keys correctly and clean caches regularly.
-- **Vulnerability Level:** Low
-    - **Justification:** Impacts efficiency but does not directly compromise security or functionality.
-
-#### [ ] 4. **Inadequate Logging**
-
-- **Strategy:** Check logs for sensitive data or excessive information.
-- **Impact:** Medium
-- **Description:** Logs that expose sensitive data or are too verbose.
-- **Mitigation:** Use `::add-mask::` to mask sensitive data and adopt standard logging practices.
-- **Vulnerability Level:** Medium
-    - **Justification:** Can expose sensitive data and hinder debugging.
-
-#### [ ] 5. **Complex Event Triggers**
-
-- **Strategy:** Verify the use of multiple triggers and the complexity in event configuration.
-- **Impact:** Medium
-- **Description:** Complex event configurations that can cause unwanted or unnecessary executions.
-- **Mitigation:** Simplify event configuration and clearly document trigger logic.
-- **Vulnerability Level:** Medium
-    - **Justification:** Increases complexity and can lead to unexpected executions.
-
-#### [ ] 6. **Improper Use of Matrix Strategy**
-
-- **Strategy:** Verify matrix configuration for unnecessary or excessive variations.
-- **Impact:** Medium
-- **Description:** Matrix configurations that create redundant or unnecessary job variations.
-- **Mitigation:** Optimize matrix configuration to avoid redundant executions.
-- **Vulnerability Level:** Medium
-    - **Justification:** Increases execution time and resource usage.
-
-#### [ ] 7. **Convoluted Conditions**
-
-- **Strategy:** Check for complex conditions (`if`, `with`, `needs`, etc.) that can be simplified.
-- **Impact:** Medium
-- **Description:** Use of complex conditions that can make the workflow hard to read and maintain.
-- **Mitigation:** Simplify conditions and clearly document conditional logic.
-- **Vulnerability Level:** Medium
-    - **Justification:** Increases complexity and can introduce hard-to-debug errors.
-
-#### [ ] 8. **Misuse of Execution Status Checks**
-
-- **Strategy:** Verify correct usage of execution status checks (`always`, `canceled`, `success`).
-- **Impact:** Medium
-- **Description:** Incorrect use of status checks that can cause unwanted executions or ignore failures.
-- **Mitigation:** Configure status checks correctly to ensure proper executions.
-- **Vulnerability Level:** Medium
-    - **Justification:** Can lead to unwanted executions or mask important failures.
-
-#### [ ] 9. **Bash Script Complexity**
-
-- **Strategy:** Check for long and complex bash scripts within steps.
-- **Impact:** Medium
-- **Description:** Complex bash scripts that can be hard to maintain and debug.
-- **Mitigation:** Split complex scripts into smaller, more manageable parts and add explanatory comments.
-- **Vulnerability Level:** Medium
-    - **Justification:** Makes maintenance difficult and increases the likelihood of errors.
-
-### Category: Efficiency
-
-#### [ ] 1. **Long Build Times**
-
-- **Strategy:** Monitor build times and identify steps causing delays.
-- **Impact:** Medium
-- **Description:** Builds that take a long time, impacting productivity.
-- **Mitigation:** Optimize build steps and use effective caching.
-- **Vulnerability Level:** Medium
-    - **Justification:** Impacts productivity but does not directly compromise security or functionality.
-
-#### [ ] 2. **Excessive Privileges**
-
-- **Strategy:** Check permissions configured in workflows.
-- **Impact:** Critical
-- **Description:** Excessive permissions configured in workflows that can lead to security risks.
-- **Mitigation:** Restrict permissions to the minimum necessary.
-- **Vulnerability Level:** Critical
-    - **Justification:** Excessive permissions can lead to severe security breaches.
-
-### Category: Quality
-
-#### [ ] 1. **Typos and Generic Words**
-
-- **Strategy:** Check job, step, and variable names for common typos or overly generic terms.
-- **Impact:** Low
-- **Description:** Typos and generic words that make the code harder to understand.
-- **Mitigation:** Adopt clear naming conventions and regularly review the code.
-- **Vulnerability Level:** Low
-    - **Justification:** Impacts readability and maintenance but does not directly compromise security or functionality.
-
-#### [ ] 2. **Inconsistent Naming Conventions**
-
-- **Strategy:** Verify that job, step, and variable names follow consistent conventions.
-- **Impact:** Low
-- **Description:** Inconsistent naming conventions that make the code harder to read and maintain.
-- **Mitigation:** Adopt and follow clear naming conventions.
-- **Vulnerability Level:** Low
-    - **Justification:** Impacts readability and maintenance but does not directly compromise security or functionality.
-
-#### [ ] 3. **Large Code Blocks**
-
-- **Strategy:** Identify steps containing long and complex scripts.
-- **Impact:** Medium
-- **Description:** Large code blocks that make the code harder to read and maintain.
-- **Mitigation:** Split long scripts into smaller, more manageable parts.
-- **Vulnerability Level:** Medium
-    - **Justification:** Impacts readability and maintenance, potentially leading to errors and debugging difficulties.
-
-#### [ ] 4. **Lack of Comments and Documentation**
-
-- **Strategy:** Check for the presence of explanatory comments and adequate documentation.
-- **Impact:** Low
-- **Description:** Lack of comments and documentation in workflows.
-- **Mitigation:** Add explanatory comments and keep documentation up to date.
-- **Vulnerability Level:** Low
-    - **Justification:** Impacts readability and maintenance but does not directly compromise security or functionality.
+  - **Justificativa:** Impacta a legibilidade e manutenção, mas não compromete diretamente a segurança ou a funcionalidade.
