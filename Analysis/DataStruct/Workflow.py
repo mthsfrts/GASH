@@ -8,7 +8,6 @@ class Workflow:
         jobs (dict): The jobs that will be executed in the workflow.
         env (dict): The environment variables that will be used in the workflow.
         concurrency (dict): The concurrency settings of the workflow.
-        raw_content (str): The raw content of the workflow.
         permissions (dict): The permissions of the workflow.
         defaults (dict): The default settings for the workflow.
     """
@@ -19,17 +18,15 @@ class Workflow:
         self.jobs = {}
         self.env = {}
         self.concurrency = None
-        self.raw_content = None
         self.permissions = {}
         self.defaults = {}
 
     def __str__(self):
-        return (f"Workflow("
+        return (f"Workflow :"
                 f"Name = {self.name},\n"
                 f"On = {self.on},\n"
                 f"Jobs = {self.jobs},\n"
                 f"Env = {self.env},\n"
                 f"Concurrency = {self.concurrency},\n"
                 f"Permissions = {self.permissions},\n"
-                f"Defaults = {self.defaults},\n"
-                f"Raw = {self.raw_content}")
+                f"Defaults = {self.defaults}")

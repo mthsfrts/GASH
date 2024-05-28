@@ -1,0 +1,12 @@
+name: Input Output Workflow
+on: [push]
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Use input
+        run: echo ${{ inputs.example_input }}
+    outputs:
+      example_output: ${{ steps.use_input.outputs.result }}

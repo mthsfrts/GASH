@@ -1,0 +1,15 @@
+name: Invalid YAML
+on: push
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: pytest
+        - invalid  # This line is incorrectly indented
+      - name: Set up environment
+        env:
+          TEST_VAR: test_value
+        run: echo $TEST_VAR

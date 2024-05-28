@@ -1,0 +1,23 @@
+name: Conditional Workflow
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        if: success()
+        run: pytest
+        with:
+          python-version: '3.8'
+      - name: Set up environment
+        env:
+          TEST_VAR: test_value
+        run: echo $TEST_VAR

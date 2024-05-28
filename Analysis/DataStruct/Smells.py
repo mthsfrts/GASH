@@ -1,4 +1,3 @@
-# Dictionaries and lists of variables and params for the smells
 class Smells:
     """
     A class to represent a smell struct.
@@ -47,7 +46,7 @@ def create_smells_from_dict(severities):
             smells_list.append(smellier)
     return smells_list
 
-
+# Dictionaries and lists of variables and params for the smells
 PROMPTS = {
     "conditions": "Analyze the following condition for potential issues:\n\n",
     "vulnerabilities": "Analyze the following content for potential vulnerabilities:\n\n",
