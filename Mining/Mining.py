@@ -10,6 +10,7 @@ from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
 from pydriller import Repository, ModificationType
 from os.path import dirname, abspath
+from bs4 import BeautifulSoup
 
 d = dirname(dirname(abspath(__file__)))
 sys.path.append(d)
@@ -251,6 +252,39 @@ class Mining:
             logging.error(f"Error when searching for issue #{issue_number}. Error: {e}")
 
         return filtered_issues
+
+    def fetch_action_verification(self, user_name, action):
+        """
+        Fetch information about a specific app based on its name.
+        """
+        try:
+            # Step 1: Attempt to fetch organization details
+            url_org = f'https://api.github.com/orgs/{user_name}'
+            response = requests.get(url_org, headers=self.github_api.headers)
+
+            if response.status_code == 404:
+                # If organization is not found, attempt to fetch user details
+                url_user = f'https://api.github.com/users/{user_name}'
+                response = requests.get(url_user, headers=self.github_api.headers)
+                response.raise_for_status()  # Raise an exception if user is not found
+
+            response.raise_for_status()  # Raise an exception for any other HTTP errors
+            user_data = response.json()
+
+            owner_verified = user_data.get('is_verified', False)
+
+            # Step 2: Scrape the GitHub Action marketplace page for verification badge
+            url_bs = f"https://github.com/marketplace/actions/{action}"
+            response_bs = requests.get(url_bs)
+            response_bs.raise_for_status()
+            soup = BeautifulSoup(response_bs.text, 'html.parser')
+            verification_badge = soup.find('svg', class_='octicon-verified') is not None
+
+            return owner_verified, verification_badge
+
+        except requests.RequestException as e:
+            logging.error(f"Error when searching for the {user_name} and {action} action. Error: {e}")
+            return False, False
 
     @staticmethod
     def threaded_analyses(query, sort='stars', order='desc', max_pages=10):
@@ -529,6 +563,11 @@ class Mining:
 # annotation_mining = 'https://api.github.com/repos/prisma/prisma/check-runs/17611151000/annotations'
 
 if __name__ == "__main__":
-    repo = "https://github.com/prisma/prisma"
-    Mining.main_repo_search()
-    Mining.commits(repo)
+    # repo = "https://github.com/prisma/prisma"
+    # Mining().main_repo_search()
+    # Mining().commits(repo)
+    logging.basicConfig(level=logging.INFO)
+    user = "di-sukharev"
+    action = "opencommit"
+    verified_user, verified_action = Mining().fetch_action_verification(user, action)
+    print(f"User Verified: {verified_user}, Action Verified: {verified_action}")

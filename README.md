@@ -2,7 +2,7 @@
 
 ## GitHub Actions Configuration Structure
 
-In GitHub Actions, workflow configurations are defined at three levels: **workflow**, **job**, and **step**. Below is a detailed description of the possible configurations at each level.
+In GitHub, actions configurations are defined at three levels: **workflow**, **job**, and **step**. Below is a detailed description of the possible configurations at each level.
 
 ### Workflow
 
@@ -188,7 +188,7 @@ steps:
     - Clear Variable and Function Names
     - Adequate Documentation
     - Code Quality Checks
-    - 
+   
 ## Detailed Smells
 ### Category: Security
 
@@ -216,13 +216,7 @@ steps:
    - **Mitigation**: Verify the reputation and security of dependencies before using them. Keep dependencies up to date.
    - **Justification**: Insecure dependencies can introduce vulnerabilities through third-party code.
 
-5. **Admin by Default**
-   - **Description**: Using unnecessary administrative tokens and permissions.
-   - **Vulnerability Level**: Critical
-   - **Mitigation**: Use tokens and permissions with the least privileges possible.
-   - **Justification**: Using unnecessary administrative permissions exposes the system to high risks, violating the principle of least privilege.
-
-6. **Use of Weak Cryptography Algorithms**
+5. **Use of Weak Cryptography Algorithms**
    - **Description**: Using outdated or weak cryptographic algorithms.
    - **Vulnerability Level**: Critical
    - **Mitigation**: Use robust and updated cryptographic algorithms.

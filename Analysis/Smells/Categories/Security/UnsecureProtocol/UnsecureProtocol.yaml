@@ -1,0 +1,21 @@
+name: Unsecure Protocol
+
+on: [push]
+
+env:
+  API_URL: http://unsecure-url.com
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      API_ENDPOINT: http://another-unsecure-url.com
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run a command
+      run: curl http://yet-another-unsecure-url.com
+      env:
+        SERVICE_URL: http://service-url.com
