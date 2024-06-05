@@ -5,6 +5,7 @@ import sys
 import re
 import shutil
 import requests
+import json
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
@@ -22,7 +23,7 @@ class Utils:
         return "None" if value is None else value
 
 
-class CSVHandlerCommit:
+class CSVReadHandler:
     def __init__(self, csv_path):
         self.csv_path = csv_path
 
@@ -85,7 +86,7 @@ class GitHubAPI:
             limit = data['resources']['core']['limit']
             used = data['resources']['core']['used']
             remaining = data['resources']['core']['remaining']
-            logging.info(f"Limite de requisições: {limit}. Usado: {used}. Restante: {remaining}.")
+            logging.info(f"Rate Limit: {limit}. Used: {used}. Left: {remaining}.")
         else:
             logging.error("Error getting the rate limit.")
 
@@ -206,7 +207,7 @@ class Mining:
             response.raise_for_status()
 
             issue = response.json()
-            if 'pull_request' not in issue:  # Ignora pull requests, considera apenas issues
+            if 'pull_request' not in issue:
                 is_pull_request = False
             else:
                 is_pull_request = True
@@ -253,7 +254,7 @@ class Mining:
 
         return filtered_issues
 
-    def fetch_action_verification(self, user_name, action):
+    def fetch_action_verification(self, user_name, action_name):
         """
         Fetch information about a specific app based on its name.
         """
@@ -274,7 +275,7 @@ class Mining:
             owner_verified = user_data.get('is_verified', False)
 
             # Step 2: Scrape the GitHub Action marketplace page for verification badge
-            url_bs = f"https://github.com/marketplace/actions/{action}"
+            url_bs = f"https://github.com/marketplace/actions/{action_name}"
             response_bs = requests.get(url_bs)
             response_bs.raise_for_status()
             soup = BeautifulSoup(response_bs.text, 'html.parser')
@@ -283,8 +284,21 @@ class Mining:
             return owner_verified, verification_badge
 
         except requests.RequestException as e:
-            logging.error(f"Error when searching for the {user_name} and {action} action. Error: {e}")
+            logging.error(f"Error when searching for the {user_name} and {action_name.upper()} actions. Error: {e}")
             return False, False
+
+    def get_repository_vulnerabilities(self, owner, name):
+        """Fetch the vulnerabilities of a repository."""
+
+        url = f'https://api.github.com/repos/{owner}/{name}/security-advisories'
+        response = requests.get(url, headers=self.github_api.headers)
+        response.raise_for_status()
+
+        if response.status_code == 200:
+            return json.dumps(response.json(), indent=4)
+        else:
+            logging.error(f"Error fetching vulnerabilities: {response.text}")
+            return None
 
     @staticmethod
     def threaded_analyses(query, sort='stars', order='desc', max_pages=10):
@@ -458,10 +472,10 @@ class Mining:
                             logging.warning(f"File {source_path} not found.")
 
                         # Getting issue number
-                        issue_tracker = Dataset.extract_issue_numbers(commit.msg)
+                        issue_tracker = Mining.extract_issue_numbers(commit.msg)
 
                         for issue_number in issue_tracker:
-                            mining_instance = GHm.Mining()
+                            mining_instance = Mining()
                             # getting commit info
                             commit_gh = mining_instance.fetch_specific_commit(owner, repo_name, commit.hash)
 
@@ -551,7 +565,7 @@ class Mining:
 
     @staticmethod
     def getting_repos(csv_path):
-        for repo_url in CSVHandlerCommit.reading_repos(csv_path):
+        for repo_url in CSVReadHandler.reading_repos(csv_path):
             Mining.commits(repo_url)
 
 
@@ -563,11 +577,16 @@ class Mining:
 # annotation_mining = 'https://api.github.com/repos/prisma/prisma/check-runs/17611151000/annotations'
 
 if __name__ == "__main__":
-    # repo = "https://github.com/prisma/prisma"
+    repo = "https://github.com/prisma/prisma"
     # Mining().main_repo_search()
     # Mining().commits(repo)
-    logging.basicConfig(level=logging.INFO)
-    user = "di-sukharev"
-    action = "opencommit"
-    verified_user, verified_action = Mining().fetch_action_verification(user, action)
-    print(f"User Verified: {verified_user}, Action Verified: {verified_action}")
+
+    mining = Mining()
+    owner = "rhysd"
+    repo_name = "github-action-benchmark"
+    vulnerabilities = mining.fetch_action_verification(owner, repo_name)
+
+    if vulnerabilities:
+        print(vulnerabilities)
+    else:
+        print("No vulnerabilities found or error occurred.")
