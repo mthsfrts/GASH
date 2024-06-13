@@ -569,13 +569,6 @@ class Mining:
             Mining.commits(repo_url)
 
 
-# actions_mining = 'https://api.github.com/repos/prisma/prisma/actions/workflows'
-# runs_mining = 'https://api.github.com/repos/prisma/prisma/actions/runs'
-# jobs_mining = 'https://api.github.com/repos/prisma/prisma/actions/runs/6485318535/jobs'
-# step_mining = 'https://api.github.com/repos/prisma/prisma/actions/jobs/17611151000'
-# check_run_mining = 'https://api.github.com/repos/prisma/prisma/check-runs/17611151000'
-# annotation_mining = 'https://api.github.com/repos/prisma/prisma/check-runs/17611151000/annotations'
-
 if __name__ == "__main__":
     repo = "https://github.com/prisma/prisma"
     # Mining().main_repo_search()

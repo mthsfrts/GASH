@@ -1,0 +1,112 @@
+name: Long Block Example
+
+on: [push]
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: |
+          echo "Command 1"
+          echo "Command 2"
+          echo "Command 3"
+          echo "Command 4"
+          echo "Command 5"
+          echo "Command 6"
+          echo "Command 7"
+          echo "Command 8"
+          echo "Command 9"
+          echo "Command 10"
+          echo "Command 11"  
+          echo "Command 12"  
+          echo "Command 13"  
+          echo "Command 14"  
+          echo "Command 15"  
+          echo "Command 16"  
+          echo "Command 17"  
+          echo "Command 18"  
+          echo "Command 19"  
+          echo "Command 20"  
+          echo "Command 21"  # Exceeds max_commands_per_step
+          
+
+  job2:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+      - name: Step 2
+        run: echo "Command 2"
+      - name: Step 3
+        run: echo "Command 3"
+      - name: Step 4
+        run: echo "Command 4"
+      - name: Step 5
+        run: echo "Command 5"
+      - name: Step 6
+        run: echo "Command 6"
+      - name: Step 7
+        run: echo "Command 7"
+      - name: Step 8
+        run: echo "Command 8"
+      - name: Step 9
+        run: echo "Command 9"
+      - name: Step 10
+        run: echo "Command 10"
+      - name: Step 11
+        run: echo "Command 11"  # Exceeds max_steps_per_job
+
+  job3:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job4:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job5:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job6:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job7:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job8:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job9:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job10:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1"
+
+  job11:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Step 1
+        run: echo "Command 1" # Exceeds max_job_per_workflow

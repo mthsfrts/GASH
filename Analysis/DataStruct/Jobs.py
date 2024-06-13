@@ -8,6 +8,7 @@ class Job:
         runs_on (str): The type of machine to run the job on.
         steps (dict): The steps that the job will run.
         env (dict): The environment variables that the job will use.
+        environment (dict): The environment that the job will run in.
         _if (str): The condition that the job will run.
         concurrency (dict): The concurrency setting for the job.
         container (dict): The container configuration for the job.
@@ -30,6 +31,7 @@ class Job:
         self.runs_on = None
         self.steps = []
         self.env = {}
+        self.environment = {}
         self._if = None
         self.concurrency = None
         self.container = None
@@ -51,7 +53,8 @@ class Job:
                 f"Id = {self._id},\n"
                 f"Runs_on = {self.runs_on},\n"
                 f"Steps = {self.steps},\n"
-                f"Rnv = {self.env},\n"
+                f"Env = {self.env},\n"
+                f"Environment = {self.environment},\n"
                 f"If = {self._if},\n"
                 f"Concurrency = {self.concurrency},\n"
                 f"Container = {self.container},\n"
@@ -59,10 +62,11 @@ class Job:
                 f"Defaults = {self.defaults},\n"
                 f"Outputs = {self.outputs},\n"
                 f"Permissions = {self.permissions},\n"
-                f"Services = {self.services},"
+                f"Services = {self.services},\n"
                 f"Strategy = {self.strategy},\n"
                 f"Secrets = {self.secrets},\n"
                 f"Timeout_Minutes = {self.timeout_minutes},\n"
                 f"Needs = {self.needs},\n"
                 f"Uses = {self.uses},\n"
-                f"With = {self.with_params}")
+                f"With = {self.with_params},"
+                f"Working_Directory = {self.working_directory}")

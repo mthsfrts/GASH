@@ -1,0 +1,161 @@
+name: Example Workflow with Smells
+
+permissions:
+  content: write-all
+
+on:
+  push:
+    branches:
+      - main
+      - 'integration/*'
+      - '*.*.x'
+
+  workflow_dispatch:
+    description: This is a dispatch trigger with various inputs.
+    inputs:
+      dispatch_input_01:
+        description: First input.
+        type: string
+        required: true
+      dispatch_input_02:
+        description: Second input.
+        type: boolean
+        required: false
+        default:
+          env: test
+      dispatch_input_03:
+        description: Third input without type.
+      dispatch_input_04:
+        type: invalid_type
+      dispatch_input_05:
+        description: Fifth input.
+        type: choice
+        options:
+          - option1
+          - option2
+      dispatch_input_06:
+        description: Sixth input.
+        type: string
+        default: default_value
+      dispatch_input_07:
+        description: Seventh input.
+        type: number
+      dispatch_input_08:
+        description: Eighth input.
+        type: boolean
+      dispatch_input_09:
+        description: Ninth input.
+        type: string
+        required: true
+      dispatch_input_10:
+        description: Tenth input.
+        type: choice
+        required: true
+      dispatch_input_11:
+        description: Eleventh input.
+        type: string
+        required: false
+      dispatch_input_12:
+        description: Twelfth input.
+        type: string
+        required: true
+      dispatch_input_13:
+        description: Thirteenth input.
+        type: boolean
+        default: true
+        required: true
+      dispatch_input_14:
+        description: Fourteenth input.
+        type: choice
+        options:
+          - option1
+          - option2
+          - option3
+      dispatch_input_15:
+        description: Fifteenth input.
+        type: string
+        required: true
+      dispatch_input_16:
+        description: Sixteenth input.
+        type: string
+        required: true
+
+  workflow_call:
+    description: This is a call trigger.
+    secrets: ${{ secrets.SOME_SECRET }}
+    inputs:
+      call_input_01:
+        description: Input for call.
+        type: choice
+        options:
+          - option1
+          - option2
+      call_input_02:
+        description: Input without type.
+      call_input_03:
+        type: invalid_type
+      call_input_04:
+        description: Fourth input.
+        type: string
+        required: true
+      call_input_05:
+        description: Fifth input.
+        type: boolean
+        default: true
+      call_input_06:
+        description: Sixth input.
+        type: choice
+        options:
+          - optionA
+          - optionB
+      call_input_07:
+        description: Seventh input.
+        type: string
+      call_input_08:
+        description: Eighth input.
+        type: number
+        required: true
+      call_input_09:
+        description: Ninth input.
+        type: boolean
+      call_input_10:
+        description: Tenth input.
+        type: string
+        default: "default value"
+      call_input_11:
+        description: Eleventh input.
+        type: string
+        required: true
+      call_input_12:
+        description: Twelfth input.
+        type: boolean
+      call_input_13:
+        description: Thirteenth input.
+        type: boolean
+        default: false
+        required: true
+      call_input_14:
+        description: Fourteenth input.
+        type: choice
+        options:
+          - optionX
+          - optionY
+      call_input_15:
+        description: Fifteenth input.
+        type: number
+      call_input_16:
+        description: Sixteenth input.
+        type: string
+        required: false
+
+  workflow_run:
+    description: This is a run trigger.
+    types:
+      - completed
+      - requested
+    workflows:
+      - 'workflow-name'
+      - 'workflow-name-2'
+    branches:
+      - main
+    branches-ignore: develop

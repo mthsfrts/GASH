@@ -172,22 +172,16 @@ steps:
    - Unsecure Protocol
    - Untrusted Dependencies
    - Admin by Default
-   - Use of Weak Cryptography Algorithms
+   - Remote Triggers
 
 2. **Maintenance and Reliability**
    - Duplicated Code
-   - Hard-Coded Values
-   - Configuration Errors
+   - Misconfiguration
    - Lack of Error Handling
-   - Fake Success
-   - Retry Failure
-   - Fuzzy Version
 
 3. **Code Quality**
     - Long Code Blocks
-    - Clear Variable and Function Names
-    - Adequate Documentation
-    - Code Quality Checks
+
    
 ## Detailed Smells
 ### Category: Security
@@ -201,8 +195,8 @@ steps:
 2. **Security Flaws**
    - **Description**: Improper configurations that allow unauthorized access or compromise the pipeline's integrity.
    - **Vulnerability Level**: Critical
-   - **Mitigation**: Regularly review security configurations and permissions. Implement robust security practices.
-   - **Justification**: Insecure configurations can open doors to a wide range of attacks, compromising the pipeline's integrity and data.
+   - **Mitigation**: Regularly review the permissions. Implement robust security practices.
+   - **Justification**: High permissions can open doors to a wide range of attacks, compromising the pipeline's integrity and data.
 
 3. **Unsecure Protocol**
    - **Description**: Using secure protocol for communication.
@@ -216,11 +210,17 @@ steps:
    - **Mitigation**: Verify the reputation and security of dependencies before using them. Keep dependencies up to date.
    - **Justification**: Insecure dependencies can introduce vulnerabilities through third-party code.
 
-5. **Use of Weak Cryptography Algorithms**
-   - **Description**: Using outdated or weak cryptographic algorithms.
-   - **Vulnerability Level**: Critical
-   - **Mitigation**: Use robust and updated cryptographic algorithms.
-   - **Justification**: Weak algorithms can be easily broken, compromising data security.
+5. **Admin by Default**
+    - **Description**: Assigning admin privileges to all users by default.
+    - **Vulnerability Level**: Critical
+    - **Mitigation**: Assign permissions based on the principle of least privilege.
+    - **Justification**: Admin privileges grant extensive control over the repository, increasing the risk of unauthorized access and data breaches.
+
+6. **Remote Triggers**
+    - **Description**: Allowing remote triggers without proper configuration.
+    - **Vulnerability Level**: Critical
+    - **Mitigation**: Implement secure configuration mechanisms for remote triggers.
+    - **Justification**: the misconfiguration of remote triggers can be exploited to execute unauthorized actions, compromising the pipeline's integrity.
 
 ### Category: Maintenance and Reliability
 
@@ -230,41 +230,17 @@ steps:
    - **Mitigation**: Refactor duplicated code into reusable workflows or actions.
    - **Justification**: Increases complexity and hinders maintenance but does not directly compromise security.
 
-2. **Hard-Coded Values**
-   - **Description**: Using fixed values in the code instead of configurable variables.
-   - **Vulnerability Level**: Medium
-   - **Mitigation**: Use environment variables to store configurations.
-   - **Justification**: Hinders code maintenance and flexibility but does not directly expose security.
-
-3. **Configuration Errors**
+2. **Misconfiguration**
    - **Description**: Incorrect configurations causing pipeline execution failures.
    - **Vulnerability Level**: Medium
    - **Mitigation**: Carefully review and test configurations before deployment.
    - **Justification**: Can lead to pipeline execution failures but generally does not directly compromise security.
 
-4. **Lack of Error Handling**
+3. **Lack of Error Handling**
    - **Description**: Absence of proper error checks and handling.
    - **Vulnerability Level**: Critical
-   -  **Mitigation**: Implement robust error checks and provide clear error messages.
+   -  **Mitigation**: Implement robust error checks.
    - **Justification**: Can result in broken builds or unexpected behavior, compromising process integrity.
-
-5. **Fake Success**
-   - **Description**: Configurations that mask failures, such as `continue-on-error: true`.
-   - **Vulnerability Level**: Medium
-   - **Mitigation**: Avoid indiscriminate use of `continue-on-error: true`.
-   - **Justification**: Masking failures can make real problems harder to detect, increasing technical debt.
-
-6. **Retry Failure**
-   - **Description**: Automatic retries that hide underlying issues.
-   - **Vulnerability Level**: Medium
-   - **Mitigation**: Limit the use of automatic retries and investigate underlying failures.
-   - **Justification**: Can hide real problems and complicate debugging but does not directly compromise security.
-
-7. **Fuzzy Version**
-   - **Description**: Using non-specific versions for dependencies.
-   - **Vulnerability Level**: Medium
-   - **Mitigation**: Use specific and precise versions for all dependencies.
-   - **Justification**: Can lead to non-reproducible builds and compatibility issues.
 
 ### Category: Code Quality
 
@@ -273,21 +249,3 @@ steps:
    - **Vulnerability Level**: Medium
    - **Mitigation**: Break long code blocks into smaller, more manageable functions.
    - **Justification**: Increases complexity and hinders maintenance but does not directly compromise security.
-
-2. **Clear Variable and Function Names**
-   - **Description**: Using unclear or meaningless variable and function names.
-   - **Vulnerability Level**: Low
-   - **Mitigation**: Adopt clear and consistent naming conventions.
-   - **Justification**: Impacts readability and maintenance but does not directly compromise security.
-
-3. **Adequate Documentation**
-   - **Description**: Lack of meaningful comments and insufficient documentation.
-   - **Vulnerability Level**: Low
-   - **Mitigation**: Include meaningful comments and maintain updated documentation.
-   - **Justification**: Facilitates maintenance but does not directly compromise security.
-
-4. **Code Quality Checks**
-   - **Description**: Absence of linting tools and static code analysis.
-   - **Vulnerability Level**: Medium
-   - **Mitigation**: Integrate linting tools and static code analysis.
-   - **Justification**: Helps ensure code meets quality standards but does not directly compromise security.

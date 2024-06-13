@@ -110,7 +110,3 @@ def test_create_smells_from_dict():
     assert smell.mitigation == "Use environment variables for secrets."
     assert smell.severity_level == "High"
     assert smell.severity_justification == "Hardcoded secrets can be easily exposed."
-
-
-if __name__ == "__main__":
-    pytest.main()

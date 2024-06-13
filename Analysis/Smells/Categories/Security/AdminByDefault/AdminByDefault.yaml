@@ -1,0 +1,19 @@
+name: Admin By Default
+
+on: [push]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write-all
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Run a command
+      run: echo 'Running secure command'

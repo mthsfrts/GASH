@@ -1,5 +1,5 @@
 import logging
-from Analysis.Utils.Utilities import Lists
+from Utils.Utilities import Lists
 
 
 class MainSecurityFlawsCheck:
@@ -18,7 +18,7 @@ class MainSecurityFlawsCheck:
 
     def check(self, content=None):
         """
-        Checking for security flaws.
+        Method to check security flaws.
 
         Attributes:
             content: Content of the file to check

@@ -13,5 +13,6 @@ class HardCodedFct:
         """
         Detects hard-coded values in the Action..
         """
+
         self.findings = self.strategy.check(self.content)
         return self.findings

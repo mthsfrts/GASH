@@ -1,5 +1,5 @@
-from Analysis.Smells.Categories.Security.UntrustedDependencies.UntrustedDependenciesSt import \
-    MainUntrustedDependenciesCheck
+from Analysis.Smells.Categories.Security.UntrustedDependencies.UntrustedDependenciesSt import (
+    MainUntrustedDependenciesCheck)
 
 
 class UntrustedDependenciesFct:

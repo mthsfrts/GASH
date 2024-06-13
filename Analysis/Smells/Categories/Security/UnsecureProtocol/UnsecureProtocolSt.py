@@ -18,7 +18,7 @@ class MainUnsecureProtocolCheck:
 
     def check(self, content=None):
         """
-        Checking for unsecure protocols.
+        Method to check unsecure protocols.
 
         Attributes:
             content: Content of the file to check

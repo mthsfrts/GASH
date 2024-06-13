@@ -67,7 +67,7 @@ class Action:
         Populates and returns a Workflow object based on raw data.
         """
         workflow = Workflow.Workflow()
-        workflow.name = raw_data.get('name', 'Default Workflow Name')
+        workflow.name = raw_data.get('name', None)
         workflow.env = raw_data.get('env', {})
         workflow.on = raw_data.get('on', {})
         workflow.jobs = {job_name: self.populate_job(job_name, job_data)

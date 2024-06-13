@@ -13,7 +13,7 @@ class MainUntrustedDependenciesCheck:
 
     def check(self, content=None):
         """
-        Strategy to check for untrusted dependencies in Actions scripts.
+        Method to check untrusted dependencies.
 
         Attributes:
             content: Content of the workflow file
@@ -44,7 +44,7 @@ class MainUntrustedDependenciesCheck:
                 logging.debug(f"Checking {level} uses: user={user}, repo={repo}, version={version}")
                 owner_verified, verification_badge = self.mining.fetch_action_verification(user, repo)
                 if not owner_verified and not verification_badge:
-                    findings.append(f"Untrusted dependency found in {level}: {uses}. "
+                    findings.append(f"Unverified dependency found in {level}: {uses}. "
                                     f"Consider using actions from verified creators.")
                 vulnerabilities = self.mining.get_repository_vulnerabilities(user, repo)
                 if vulnerabilities:

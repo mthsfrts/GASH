@@ -58,18 +58,23 @@ def test_untrusted_dependencies_detection(mock_get_vulns, workflow):
     logging.debug(f"Findings: {findings}")
 
     expected_findings = [
-        "Untrusted dependency found in step in job benchmark: actions/checkout@v4. "
-        "Consider using actions from verified creators.",
-        "Untrusted dependency found in step in job benchmark: rhysd/github-action-benchmark@v1. "
-        "Consider using actions from verified creators.",
-        "Vulnerabilities found in step in job benchmark: CodSpeedHQ/action@v2. "
+        'Unverified dependency found in step in job benchmark: actions/checkout@v4. '
+        'Consider using actions from verified creators.',
+        'Unverified dependency found in step in job benchmark: '
+        'rhysd/github-action-benchmark@v1. Consider using actions from verified '
+        'creators.',
+        'Unverified dependency found in step in job benchmark: CodSpeedHQ/action@v2. '
+        'Consider using actions from verified creators.',
+        'Vulnerabilities found in step in job benchmark: CodSpeedHQ/action@v2. '
         "Details: {'ghsa_id': 'GHSA-7f32-hm4h-w77q', 'cve_id': 'CVE-2022-39321', "
-        "'summary': 'Example vulnerability', 'description': 'This is a mock vulnerability description.', "
-        "'severity': 'high', 'identifiers': [{'value': 'GHSA-7f32-hm4h-w77q', 'type': 'GHSA'}, "
-        "{'value': 'CVE-2022-39321', 'type': 'CVE'}], 'state': 'published', 'published_at': '2022-10-24T16:00:18Z', "
+        "'summary': 'Example vulnerability', 'description': 'This is a mock "
+        "vulnerability description.', 'severity': 'high', 'identifiers': [{'value': "
+        "'GHSA-7f32-hm4h-w77q', 'type': 'GHSA'}, {'value': 'CVE-2022-39321', 'type': "
+        "'CVE'}], 'state': 'published', 'published_at': '2022-10-24T16:00:18Z', "
         "'updated_at': '2022-10-24T16:00:18Z'}",
-        "Untrusted dependency found in step in job benchmark: rtCamp/action-slack-notify@v2.3.0. "
-        "Consider using actions from verified creators."
+        'Unverified dependency found in step in job benchmark: '
+        'rtCamp/action-slack-notify@v2.3.0. Consider using actions from verified '
+        'creators.'
     ]
 
     assert findings == expected_findings
@@ -79,26 +84,31 @@ def test_untrusted_dependencies_detection(mock_get_vulns, workflow):
 def test_integration(mock_get_vulns):
     logging.debug("Running test_integration")
     action = Action(file_path="UntrustedDependencies.yaml")
-    workflow = action.prepare_for_analysis()
-    logging.debug(f"Parsed workflow: {workflow}")
+    workflow_file = action.prepare_for_analysis()
+    logging.debug(f"Parsed workflow: {workflow_file}")
 
-    factory = UntrustedDependenciesFct(content=workflow)
+    factory = UntrustedDependenciesFct(content=workflow_file)
     findings = factory.detect()
     logging.debug(f"Findings: {findings}")
 
     expected_findings = [
-        "Untrusted dependency found in step in job benchmark: actions/checkout@v4. "
-        "Consider using actions from verified creators.",
-        "Untrusted dependency found in step in job benchmark: rhysd/github-action-benchmark@v1. "
-        "Consider using actions from verified creators.",
-        "Vulnerabilities found in step in job benchmark: CodSpeedHQ/action@v2. "
+        'Unverified dependency found in step in job benchmark: actions/checkout@v4. '
+        'Consider using actions from verified creators.',
+        'Unverified dependency found in step in job benchmark: '
+        'rhysd/github-action-benchmark@v1. Consider using actions from verified '
+        'creators.',
+        'Unverified dependency found in step in job benchmark: CodSpeedHQ/action@v2. '
+        'Consider using actions from verified creators.',
+        'Vulnerabilities found in step in job benchmark: CodSpeedHQ/action@v2. '
         "Details: {'ghsa_id': 'GHSA-7f32-hm4h-w77q', 'cve_id': 'CVE-2022-39321', "
-        "'summary': 'Example vulnerability', 'description': 'This is a mock vulnerability description.', "
-        "'severity': 'high', 'identifiers': [{'value': 'GHSA-7f32-hm4h-w77q', 'type': 'GHSA'}, "
-        "{'value': 'CVE-2022-39321', 'type': 'CVE'}], 'state': 'published', 'published_at': '2022-10-24T16:00:18Z', "
+        "'summary': 'Example vulnerability', 'description': 'This is a mock "
+        "vulnerability description.', 'severity': 'high', 'identifiers': [{'value': "
+        "'GHSA-7f32-hm4h-w77q', 'type': 'GHSA'}, {'value': 'CVE-2022-39321', 'type': "
+        "'CVE'}], 'state': 'published', 'published_at': '2022-10-24T16:00:18Z', "
         "'updated_at': '2022-10-24T16:00:18Z'}",
-        "Untrusted dependency found in step in job benchmark: rtCamp/action-slack-notify@v2.3.0. "
-        "Consider using actions from verified creators."
+        'Unverified dependency found in step in job benchmark: '
+        'rtCamp/action-slack-notify@v2.3.0. Consider using actions from verified '
+        'creators.'
     ]
 
     assert findings == expected_findings

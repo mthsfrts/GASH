@@ -39,10 +39,10 @@ def test_security_flaws_detection(workflow):
 def test_integration():
     logging.debug("Running test_integration")
     action = Action(file_path="SecurityFlaws.yaml")
-    workflow = action.prepare_for_analysis()
-    logging.debug(f"Parsed workflow: {workflow}")
+    workflow_file = action.prepare_for_analysis()
+    logging.debug(f"Parsed workflow: {workflow_file}")
 
-    factory = SecurityFlawsFct(content=workflow)
+    factory = SecurityFlawsFct(content=workflow_file)
     findings = factory.detect()
     logging.debug(f"Findings: {findings}")
 

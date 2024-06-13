@@ -1,6 +1,6 @@
 import re
 import logging
-from Analysis.Utils.Utilities import Lists
+from Utils.Utilities import Lists
 
 
 class MainHardCodedCheck:
@@ -8,6 +8,7 @@ class MainHardCodedCheck:
     Strategy to check for hard-coded secrets in Actions scripts
 
     Attributes:
+        content: Content of the file to check
         keywords: List of keywords to search for in the scripts
         regex: List of regex patterns to search for in the scripts
         safe Pattern: Pattern to search for safe secrets
@@ -23,7 +24,7 @@ class MainHardCodedCheck:
 
     def check(self, content=None):
         """
-        Checking for hard-coded secrets
+        Method to check hard-coded secrets
 
         Attributes:
             content: Content of the file to check
@@ -32,6 +33,7 @@ class MainHardCodedCheck:
             findings: List of findings
         """
         findings = []
+
         # Check workflow level
         logging.debug(f"Checking workflow level: {content.env}")
         findings.extend(self._check_env(content.env, 'workflow'))
