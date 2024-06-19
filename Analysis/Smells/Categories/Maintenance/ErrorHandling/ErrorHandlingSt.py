@@ -79,12 +79,12 @@ class MainErrorHandlingCheck:
                                      f"It is recommended to set a timeout for jobs to prevent them from running "
                                      f"with the default value of 6 hours and consuming resources unnecessarily.")
 
-            if job.timeout_minutes == 1:
+            elif job.timeout_minutes == 1:
                 self.findings.append(f"Job '{job_name}' has a timeout of {job.timeout_minutes} min. "
                                      f"This is a short time for a job to run. If the timeout have a short value, "
                                      f"it will lead to cancel the job before it finishes.")
 
-            if job.timeout_minutes >= 10:
+            elif job.timeout_minutes >= 10:
                 self.findings.append(f"Job '{job_name}' has a timeout of {job.timeout_minutes} min. "
                                      f"This is a long time for a job to run. If a job is taking this long to run, "
                                      f"it may be a sign that something is wrong. "
@@ -97,12 +97,12 @@ class MainErrorHandlingCheck:
                                          f"It is recommended to set a timeout for steps to prevent them from running "
                                          f"with the default value of 6 hours and consuming resources unnecessarily.")
 
-                if step.timeout_minutes == 1:
+                elif step.timeout_minutes == 1:
                     self.findings.append(f"Step '{step.name}' has a timeout of {step.timeout_minutes} min. "
                                          f"This is a short time for a step to run. If the timeout have a short value, "
                                          f"it will lead to cancel the step before it finishes.")
 
-                if step.timeout_minutes >= 10:
+                elif step.timeout_minutes >= 10:
                     self.findings.append(f"Step '{step.name}' has a timeout of {step.timeout_minutes} min. "
                                          f"This is a long time for a step to run. If a step is taking this long to run, "
                                          f"it may be a sign that something is wrong. "

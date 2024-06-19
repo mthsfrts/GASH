@@ -1,10 +1,22 @@
+import csv
 import re
+import platform
 
 
-class Utility:
+class Config:
     """
     A class that contains utility methods.
+
+    Attributes:
+        csv_path (str): The path to the CSV file containing repository URLs.
     """
+
+    def __init__(self, csv_path):
+        self.csv_path = csv_path
+
+    @classmethod
+    def handle_none(cls, value):
+        return "None" if value is None else value
 
     @staticmethod
     def find_pattern(text, pattern):
@@ -54,6 +66,30 @@ class Utility:
             if branch in push_branches:
                 return True
         return False
+
+    def reading_repos(self, row_number):
+        """
+        Reads the CSV file containing repository URLs.
+
+        Yields:
+            str: The URL of each repository read from the CSV file.
+        """
+        with open(self.csv_path, mode='r', newline='', encoding='utf-8') as file:
+            reader = csv.reader(file)
+            next(reader)
+            for row in reader:
+                repo_url = row[int(row_number)]
+                yield repo_url
+
+    @staticmethod
+    def get_base_directory():
+        system = platform.system()
+        if system == 'Windows':
+            return "C:\\Generated"
+        elif system == 'Linux' or system == 'Darwin':
+            return "/root/Generated"
+        else:
+            raise Exception("Unsupported operating system")
 
 
 class Lists:

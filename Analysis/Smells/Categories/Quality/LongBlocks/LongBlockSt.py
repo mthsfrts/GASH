@@ -49,11 +49,15 @@ class MainLongBlockCheck:
                                      f"debug and can lead to security vulnerabilities.")
 
             for step in job.steps:
-                commands_count = len(step.run.split('\n'))
-                if commands_count > self.max_commands_per_step:
-                    self.findings.append(f"The step '{step.name}' run has more than {commands_count} commands. "
-                                         f"Consider splitting the commands into multiple step groups. "
-                                         f"A longer step group can be difficult to maintain and "
-                                         f"debug and can lead to security vulnerabilities.")
+                if step.run is None:
+                    self.findings.append(f"The step '{step.name}' does not have any commands to run.")
+                else:
+                    commands_count = len(step.run.split('\n'))
+                    if commands_count > self.max_commands_per_step:
+                        self.findings.append(f"The step '{step.name}' run has more than {commands_count} commands. "
+                                             f"Consider splitting the commands into multiple step groups. "
+                                             f"A longer step group can be difficult to maintain and "
+                                             f"debug and can lead to security vulnerabilities.")
 
         return self.findings
+

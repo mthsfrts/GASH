@@ -1,0 +1,15 @@
+name: DataStruct Workflow
+on:
+  push:
+    branches:
+      - main
+env:
+  GLOBAL_VAR: global_value
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: pytest

@@ -1,3 +1,6 @@
+from Utils.Utilities import Lists
+
+
 class MainRemoteRunCheck:
     """
     Strategy to check remote triggers configurations in GitHub Actions workflows.
@@ -5,6 +8,7 @@ class MainRemoteRunCheck:
 
     def __init__(self):
         self.findings = []
+        self.list = Lists()
 
     def check(self, workflow):
         """
@@ -24,8 +28,8 @@ class MainRemoteRunCheck:
         Args:
             workflow: A Workflow object representing the GitHub Actions workflows.
         """
-        dispatch = workflow.on['workflow_dispatch']
-        branches = workflow.on['push']['branches']
+        dispatch = workflow.on.get('workflow_dispatch', None)
+        branches = workflow.on.get('push', {}).get('branches', [])
         permissions = workflow.permissions
 
         if dispatch is None:
@@ -33,72 +37,73 @@ class MainRemoteRunCheck:
                 "Workflow-dispatch is empty. This parameter is mainly responsible for manually trigger the workflow."
                 "Consider a secure configuration for it, the lack of it might bring critical issues for your pipeline."
             )
-
-        if isinstance(permissions, str):
-            if permissions in ['write', 'write-all']:
-                for branch in branches:
-                    if branch in ['master', 'main', 'production']:
-                        self.findings.append(
-                            f"Workflow dispatch trigger is set on a critical branch: {branch}"
-                            f", with a higher permission: {permissions}, set on the workflow level. "
-                            f"Consider adding the best security protocol for it. "
-                            f"This trigger might harm your pipeline if it is not configured correctly."
-                        )
-
-        elif isinstance(permissions, dict):
-            for key, permission in permissions.items():
-                if permission in ['write', 'write-all']:
+        else:
+            if isinstance(permissions, str):
+                if permissions in self.list.permissions:
                     for branch in branches:
                         if branch in ['master', 'main', 'production']:
                             self.findings.append(
                                 f"Workflow dispatch trigger is set on a critical branch: {branch}"
-                                f", with a higher permission: {permission}, set on the workflow level. "
+                                f", with a higher permission: {permissions}, set on the workflow level. "
                                 f"Consider adding the best security protocol for it. "
                                 f"This trigger might harm your pipeline if it is not configured correctly."
                             )
 
-        else:
-            self.findings.append(
-                "Workflow dispatch trigger is set with a higher permission on the workflow level. "
-                "Consider the add best security protocol for it. This trigger might harm your pipeline if it is not "
-                "configure correctly."
-            )
+            elif isinstance(permissions, dict):
+                for key, permission in permissions.items():
+                    if permission in ['write', 'write-all']:
+                        for branch in branches:
+                            if branch in ['master', 'main', 'production']:
+                                self.findings.append(
+                                    f"Workflow dispatch trigger is set on a critical branch: {branch}"
+                                    f", with a higher permission: {permission}, set on the workflow level. "
+                                    f"Consider adding the best security protocol for it. "
+                                    f"This trigger might harm your pipeline if it is not configured correctly."
+                                )
 
-        if 'inputs' in dispatch:
-            inputs = dispatch['inputs']
+            else:
+                self.findings.append(
+                    "Workflow dispatch trigger is set with a higher permission on the workflow level. "
+                    "Consider the add best security protocol for it. This trigger might harm your pipeline if it is not "
+                    "configure correctly."
+                )
 
-            if len(inputs) > 15:
-                self.findings.append("The trigger has too many inputs. Consider simplify it, "
-                                     "the inputs overflow, can cause security and maintenance issues.")
+            if 'inputs' in dispatch:
+                inputs = dispatch['inputs']
 
-            for dispatch_name, dispatch_config in inputs.items():
+                if len(inputs) > 15:
+                    self.findings.append("The trigger has too many inputs. Consider simplify it, "
+                                         "the inputs overflow, can cause security and maintenance issues.")
 
-                if 'description' not in dispatch_config:
-                    self.findings.append(f"Input '{dispatch_name}' lacks a description. Consider add a description "
-                                         f"for a better understanding and maintenance.")
+                for dispatch_name, dispatch_config in inputs.items():
 
-                if 'type' in dispatch_config:
-                    input_type = dispatch_config['type']
-                    if input_type not in ['string', 'boolean', 'choice', 'number', 'environment']:
-                        self.findings.append(f"Input '{dispatch_name}' has an invalid type '{input_type}'.")
-                    elif input_type is None:
-                        self.findings.append(f"Input '{dispatch_name}' does not have a specified type defined. "
-                                             f"You need to define a type for it.")
+                    if 'description' not in dispatch_config:
+                        self.findings.append(f"Input '{dispatch_name}' lacks a description. Consider add a description "
+                                             f"for a better understanding and maintenance.")
 
-                    if input_type == 'choice' and 'options' not in dispatch_config:
-                        self.findings.append(f"Input '{dispatch_name}' of type 'choice' lacks 'options' definition.")
+                    if 'type' in dispatch_config:
+                        input_type = dispatch_config['type']
+                        if input_type not in ['string', 'boolean', 'choice', 'number', 'environment']:
+                            self.findings.append(f"Input '{dispatch_name}' has an invalid type '{input_type}'.")
+                        elif input_type is None:
+                            self.findings.append(f"Input '{dispatch_name}' does not have a specified type defined. "
+                                                 f"You need to define a type for it.")
 
-                    if input_type == 'boolean' and 'required' in dispatch_config:
-                        self.findings.append(
-                            f"Input '{dispatch_name}' of type 'boolean' should not be required. "
-                            f"Consider remove the parameter.")
+                        if input_type == 'choice' and 'options' not in dispatch_config:
+                            self.findings.append(
+                                f"Input '{dispatch_name}' of type 'choice' lacks 'options' definition.")
 
-                    if ('required' in dispatch_config and dispatch_config['required'] and 'default'
-                            not in dispatch_config):
-                        self.findings.append(f"Input '{dispatch_name}' is required but has no default value.")
-        else:
-            self.findings.append("No inputs defined for workflow dispatch. Consider add some inputs to better "
-                                 "security and maintenance.")
+                        if input_type == 'boolean' and 'required' in dispatch_config:
+                            self.findings.append(
+                                f"Input '{dispatch_name}' of type 'boolean' should not be required. "
+                                f"Consider remove the parameter.")
+
+                        if ('required' in dispatch_config and dispatch_config['required'] and 'default'
+                                not in dispatch_config):
+                            self.findings.append(f"Input '{dispatch_name}' is required but has no default value.")
+            else:
+                self.findings.append("No inputs defined for workflow dispatch. Consider add some inputs to better "
+                                     "security and maintenance.")
 
         return self.findings
 
@@ -109,13 +114,13 @@ class MainRemoteRunCheck:
         Args:
             workflow: A Workflow object representing the GitHub Actions workflows.
         """
-        call = workflow.on['workflow_call']
-        secrets = call['secrets']
+        call = workflow.on.get('workflow_call', None)
+        secrets = workflow.on.get('workflow_call', {}).get('secrets', {})
         permissions = workflow.permissions
 
         if isinstance(permissions, dict):
             for key, permission in permissions.items():
-                if permission in ['write-all', 'write']:
+                if permission in self.list.permissions:
                     self.findings.append(
                         "Workflow call trigger is set with a higher permission on a workflow level. "
                         "Consider the add best security protocol for it. "
@@ -124,7 +129,7 @@ class MainRemoteRunCheck:
                     )
 
         if isinstance(permissions, str):
-            if permissions in ['write', 'write-all']:
+            if permissions in self.list.permissions:
                 self.findings.append(
                     "Workflow call trigger is set with a higher permission on a workflow level. "
                     "Consider the add best security protocol for it. "
@@ -137,7 +142,7 @@ class MainRemoteRunCheck:
                 "Secrets should not be directly referenced in workflow call. Consider use Secrets Env to do so. "
                 "Ex: ${{ secrets.SECRET_NAME }}.")
 
-        if 'inputs' in call:
+        if call and 'inputs' in call:
             inputs = call['inputs']
 
             if len(inputs) > 15:
@@ -176,7 +181,7 @@ class MainRemoteRunCheck:
         return self.findings
 
     def check_run(self, workflow):
-        run = workflow.on['workflow_run']
+        run = workflow.on.get('workflow_run', None)
 
         if run is None:
             self.findings.append(
@@ -184,7 +189,7 @@ class MainRemoteRunCheck:
                 "workflow is completed. You need to provide some inputs for the trigger to run."
             )
 
-        if 'branches' and 'branches-ignore' in run:
+        elif 'branches' and 'branches-ignore' in run:
             self.findings.append(
                 "Workflow-run has both 'branches' and 'branches-ignore' defined. If you want to both include and "
                 "exclude branch patterns for a single event, use the branches filter along with the '!' character to "
@@ -192,19 +197,19 @@ class MainRemoteRunCheck:
                 "not a directly security one."
             )
 
-        if 'description' not in run:
+        elif 'description' not in run:
             self.findings.append(
                 "Workflow-run lacks a description. Consider add a description for a better "
                 "understanding and maintenance."
             )
 
-        if 'types' not in run:
+        elif 'types' not in run:
             self.findings.append(
                 "Workflow-run lacks a type. Consider add a type for a better"
                 " understanding and maintenance."
             )
 
-        if 'workflow' not in run:
+        elif 'workflow' not in run:
             self.findings.append(
                 "Workflow_run lacks a workflow. You need to add a event to trigger the Run."
             )

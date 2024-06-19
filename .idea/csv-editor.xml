@@ -3,21 +3,21 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/Mining/generated/database/commit_prisma.csv">
+        <entry key="/Miner/generated/database/commit_prisma.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="/Mining/generated/database/gash_prisma.csv">
+        <entry key="/Miner/generated/database/gash_prisma.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />
             </Attribute>
           </value>
         </entry>
-        <entry key="/Mining/generated/database/repos_dataset.csv">
+        <entry key="/Miner/generated/database/repos_dataset.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

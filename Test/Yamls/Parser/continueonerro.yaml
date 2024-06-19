@@ -1,0 +1,14 @@
+# Parser/continue_on_error_test.yaml
+name: Continue on Error Workflow
+on: [push]
+jobs:
+  test_job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run tests
+        run: pytest
+        continue-on-error: true
+      - name: Deploy
+        run: ./deploy.sh
