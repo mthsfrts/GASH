@@ -1,8 +1,0 @@
-    name: Workflow with Default Values
-    on: push
-    jobs:
-      test_job:
-        runs-on: ubuntu-latest
-        steps:
-          - name: Checkout code
-            run: echo "Checking out code"
