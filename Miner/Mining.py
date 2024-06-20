@@ -4,6 +4,7 @@ import os
 import sys
 import re
 import shutil
+import  time
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
@@ -15,12 +16,24 @@ sys.path.append(d)
 
 from APIs.GitHub import GitHubAPI
 from Utils import Utilities
+from Analysis.Parse import ActionParser
+from Analysis.Smells.Categories.Maintenance.CodeReplica.CodeReplicaFct import CodeReplicaFct
+from Analysis.Smells.Categories.Maintenance.ErrorHandling.ErrorHandlingFct import ErrorHandlingFct
+from Analysis.Smells.Categories.Maintenance.Misconfiguration.MisconfigurationFct import MisconfigurationFct
+from Analysis.Smells.Categories.Quality.LongBlocks.LongBlockFct import LongBlockFct
+from Analysis.Smells.Categories.Security.AdminByDefault.AdminByDefaultFct import AdminByDefaultFct
+from Analysis.Smells.Categories.Security.HardCoded.HardCodedFct import HardCodedFct
+from Analysis.Smells.Categories.Security.RemoteTriggers.RemoteTriggersFct import RemoteRunFct
+from Analysis.Smells.Categories.Security.UnsecureProtocol.UnsecureProtocolFct import UnsecureProtocolFct
+from Analysis.Smells.Categories.Security.UntrustedDependencies.UntrustedDependenciesFct import UntrustedDependenciesFct
 
 
 class Mining:
-    def __init__(self, tk):
-        self.github_api = GitHubAPI(tk)
+    def __init__(self, token):
+        self.token = token
+        self.github_api = GitHubAPI(self.token)
         self.handler = Utilities.Config
+        self.parser = ActionParser
 
     def threaded_analyses(self, query, sort='stars', order='desc', max_pages=10):
         """Search and filter repositories that have the desired Parser in a single function."""
@@ -43,7 +56,7 @@ class Mining:
         matches = re.findall(pattern, commit_msg)
         return matches
 
-    def repo(self, years, stars):
+    def repo(self, years, _min, _max):
         """ Search for repos using filters to qualify them.
             Attributes:
                 years: Age of the repositories you want mining.
@@ -56,14 +69,13 @@ class Mining:
         self.github_api.get_rate_limit()
 
         date_cutoff = (datetime.now() - timedelta(days=years * 365)).strftime('%Y-%m-%d')
-        stars = stars
 
         all_repos = []
 
         query = (
             "is:public "
-            f"created:<{date_cutoff} "
-            f"stars:>{stars} "
+            f"created:>={date_cutoff} "
+            f"stars:{_min}..{_max} "
         )
 
         repos_for_this_extension = self.threaded_analyses(query)
@@ -83,8 +95,8 @@ class Mining:
 
         with open(file_path, mode='w', newline='', encoding='utf-8') as file:
             writer = csv.writer(file)
-            headers = ["Owner", "Repo", "Description", "URL", "Language", "Stars", "Open Issues Count",
-                       "Created At", "Updated At", "Size", "Has Downloads", "YML Count", "YML Files"]
+            headers = ["Owner", "Repo", "Description", "URL", "Language", "Stars", "Open Issues count",
+                       "Created At", "Updated At", "Size", "Has Downloads", "YML count", "YML Files"]
             writer.writerow(headers)
 
             for repo in repos_with_yml:
@@ -94,7 +106,6 @@ class Mining:
                     repo["YML Count"], repo["YML Files"]
                 ])
 
-        # self.handler.save_to_csv(repos_with_yml, filename)
         print("DataSet Created")
 
     def commits(self, repo_url):
@@ -155,7 +166,7 @@ class Mining:
             "Type Of Commit",
             "Added lines",
             "Deleted lines",
-            "Token Count",
+            "Token count",
             "Issue Tracker",
             "Issue Creator",
             "Issue Creator Acc type",
@@ -175,6 +186,15 @@ class Mining:
             "DMM_Unit",
             "DMM_Complexity",
             "DMM_Interfacing",
+            "CodeReplica",
+            "ErrorHandling",
+            "Misconfiguration",
+            "LongBlock",
+            "AdminByDefault",
+            "HardCoded",
+            "RemoteTriggers",
+            "UnsecureProtocol",
+            "UntrustedDependencies",
             "Diff"
         ]
 
@@ -201,7 +221,7 @@ class Mining:
                     if (filepath and filepath.startswith('.github/workflows/') and
                             (filepath.endswith(f'.{extension1}') or filepath.endswith(f'.{extension2}'))):
 
-                        # Checking the Parser' status
+                        # Checking the Parser status
                         if modification.change_type.name == "DELETE":
                             source_path = None
                         else:
@@ -236,8 +256,21 @@ class Mining:
                             # getting issue info
                             issues = self.github_api.fetch_specific_issues(owner, repo_name, issue_number)
 
-                            if modification.source_code is not None:
-                                continue
+                            # smell analysis
+                            if modification.change_type.name != "DELETE":
+                                file = os.path.join(base_dir, current_filepath)
+                                action = self.parser.Action(file_path=file)
+                                workflow = action.prepare_for_analysis()
+
+                                codereplica = CodeReplicaFct(workflow).detect()
+                                errorhandling = ErrorHandlingFct(workflow).detect()
+                                misconfiguration = MisconfigurationFct(workflow).detect()
+                                longblock = LongBlockFct(workflow).detect()
+                                adminbydefault = AdminByDefaultFct(workflow).detect()
+                                hardcoded = HardCodedFct(workflow).detect()
+                                triggers = RemoteRunFct(workflow).detect()
+                                unsecureprotocol = UnsecureProtocolFct(workflow).detect()
+                                untrusteddependencies = UntrustedDependenciesFct(workflow, self.token).detect()
 
                             if issues:  # checking if that commit is really an issue
                                 issue_creator = issues[0]['Creator']
@@ -257,46 +290,55 @@ class Mining:
                                 auth_acc_type = commit_gh[0]['Author Acc']
                                 comt_acc_type = commit_gh[0]['Committer Acc']
 
-                                writer.writerow(
-                                    [commit.project_name,
-                                     commit.author.name,
-                                     auth_acc_type,
-                                     commit.author.email,
-                                     commit.committer.name,
-                                     comt_acc_type,
-                                     commit.committer.email,
-                                     commit.hash,
-                                     commit.parents[-1] if commit.parents else None,
-                                     commit.committer_date,
-                                     commit.msg,
-                                     commit.files,
-                                     issue_milestone,
-                                     modification.filename,
-                                     modification.change_type.name,
-                                     modification.added_lines,
-                                     modification.deleted_lines,
-                                     modification.token_count,
-                                     ','.join(issue_tracker),
-                                     issue_creator,
-                                     issue_creator_type,
-                                     issue_creator_association,
-                                     issue_closer,
-                                     issue_closer_type,
-                                     issue_created_at,
-                                     issue_closed_at,
-                                     issue_state,
-                                     issue_labels,
-                                     issue_reviewers,
-                                     issue_reviewers_type,
-                                     issue_body,
-                                     os.path.join(base_dir, current_filepath),
-                                     os.path.join(base_dir, before_filepath),
-                                     os.path.join(base_dir, after_filepath),
-                                     self.handler.handle_none(commit.dmm_unit_size),
-                                     self.handler.handle_none(commit.dmm_unit_complexity),
-                                     self.handler.handle_none(commit.dmm_unit_interfacing),
-                                     modification.diff
-                                     ])
+                                writer.writerow([
+                                    commit.project_name,
+                                    commit.author.name,
+                                    auth_acc_type,
+                                    commit.author.email,
+                                    commit.committer.name,
+                                    comt_acc_type,
+                                    commit.committer.email,
+                                    commit.hash,
+                                    commit.parents[-1] if commit.parents else None,
+                                    commit.committer_date,
+                                    commit.msg,
+                                    commit.files,
+                                    issue_milestone,
+                                    modification.filename,
+                                    modification.change_type.name,
+                                    modification.added_lines,
+                                    modification.deleted_lines,
+                                    modification.token_count,
+                                    ','.join(issue_tracker),
+                                    issue_creator,
+                                    issue_creator_type,
+                                    issue_creator_association,
+                                    issue_closer,
+                                    issue_closer_type,
+                                    issue_created_at,
+                                    issue_closed_at,
+                                    issue_state,
+                                    issue_labels,
+                                    issue_reviewers,
+                                    issue_reviewers_type,
+                                    issue_body,
+                                    os.path.join(base_dir, current_filepath),
+                                    os.path.join(base_dir, before_filepath),
+                                    os.path.join(base_dir, after_filepath),
+                                    self.handler.handle_none(commit.dmm_unit_size),
+                                    self.handler.handle_none(commit.dmm_unit_complexity),
+                                    self.handler.handle_none(commit.dmm_unit_interfacing),
+                                    codereplica,
+                                    errorhandling,
+                                    misconfiguration,
+                                    longblock,
+                                    adminbydefault,
+                                    hardcoded,
+                                    triggers,
+                                    unsecureprotocol,
+                                    untrusteddependencies,
+                                    modification.diff
+                                ])
 
                                 logging.info(f"Project: {commit.project_name}")
                                 logging.info(f"Author: {commit.author.name}")
@@ -317,18 +359,34 @@ class Mining:
 
             logging.info("Dataset Created.")
 
-    def batch(self, file, column):
+    def batch(self, file, url, count, desired):
         """
-        Responsible to mine commits from a batch of repositories.
+        Responsible for mining commits from a batch of repositories.
 
         Attributes:
             file: CSV file with the repositories URLs.
-            column: Column number with the repositories URLs.
+            url: Column number with the repositories URLs.
+            count: Column number with the total of yaml files.
+            desired: The total number of files that will filter the repositories to be mined.
 
-
-        Returns: CSV file with the commits infos.
+        Returns: CSV file with the commit info.
         """
         csv_file = self.handler(file)
-        for repo_url in self.handler.reading_repos(csv_file, column):
-            self.commits(repo_url)
+        for repo_url in self.handler.reading_repos(csv_file, url, count, desired):
+            attempts = 0
+            while attempts < 3:
+                try:
+                    self.commits(repo_url)
+                    break
+                except Exception as e:
+                    logging.error(f"Error processing repository {repo_url}. Attempt {attempts + 1} of 3. Error: {e}")
+                    attempts += 1
+                    if attempts < 3:
+                        logging.info(f"Retrying in {10 * attempts} seconds...")
+                        time.sleep(10 * attempts)
+                    else:
+                        logging.error(f"Failed to process repository {repo_url} "
+                                      f"after 3 attempts. Moving to the next one.")
+            time.sleep(30)
+
 

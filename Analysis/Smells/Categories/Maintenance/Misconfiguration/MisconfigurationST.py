@@ -41,7 +41,7 @@ class MainMisconfigurationCheck:
         # Checking for missing parameters in the Workflow level
         if not workflow.name:
             self.findings.append(
-                "Workflow is missing the 'name' parameter. "
+                "No 'name' were set for the workflow. "
                 "Consider providing an 'alias' for the workflow for better maintenance.")
 
         if not workflow.on:
@@ -52,7 +52,7 @@ class MainMisconfigurationCheck:
 
         if not workflow.defaults:
             self.findings.append(
-                "Workflow is missing the 'defaults' parameter. Consider using the 'defaults' "
+                "No 'defaults' values were set on the workflow. Consider using the 'defaults' "
                 "parameter to set the common values for all your jobs."
             )
 
@@ -61,9 +61,9 @@ class MainMisconfigurationCheck:
 
             if not job.environment:
                 self.findings.append(
-                    "Job '{job_name}' is missing the 'environment' parameter. "
-                    "Consider create a new environment for better security and maintenance. "
-                    "You can find all the available environments at "
+                    f"Job '{job_name}' has no 'environment' parameter set. "
+                    "Consider create environments for better security and maintenance. "
+                    "You can find all the info about it at "
                     "https://docs.github.com/en/actions/deployment/targeting-different-environments"
                 )
 
@@ -77,12 +77,12 @@ class MainMisconfigurationCheck:
                 if not step.uses:
                     self.findings.append(
                         f"Step '{step.name}' in job '{job_name}' is missing the 'uses' parameter. "
-                        f"Consider specifying the action to use.")
+                        f"Consider specify an action for it.")
 
                 if not step.run:
                     self.findings.append(
                         f"Step '{step.name}' in job '{job_name}' is missing the 'run' parameter. "
-                        f"Consider specifying the shell command to run.")
+                        f"Consider specifying the command to run.")
 
             return self.findings
 

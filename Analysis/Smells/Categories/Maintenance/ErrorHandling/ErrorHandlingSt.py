@@ -40,6 +40,8 @@ class MainErrorHandlingCheck:
                                      f"This could be useful in some cases, but it is generally not recommended."
                                      f"Meaning that the job will continue to run even if a step fails. "
                                      f"This can lead to unexpected behavior and should be avoided.")
+            else:
+                continue
 
             for step in job.steps:
                 if step.continue_on_error:
@@ -47,6 +49,8 @@ class MainErrorHandlingCheck:
                                          f"This could be useful in some cases, but it is generally not recommended."
                                          f"Meaning that the step will continue to run even if it fails. "
                                          f"This can lead to unexpected behavior and should be avoided.")
+                else:
+                    continue
 
         return self.findings
 
@@ -56,12 +60,14 @@ class MainErrorHandlingCheck:
         """
 
         for job_name, job in workflow.jobs.items():
-            if job.strategy:
+            if 'fail-fast' in job.strategy:
                 failfast = job.strategy['fail-fast']
-                if failfast not in [True, 'True', 'true']:
+                if failfast not in [False, 'false', 'False']:
                     self.findings.append(f"Job '{job.name}' has fail-fast set to {failfast}. "
                                          f"This means that the job will continue to run even if a step fails. "
                                          f"This can lead to unexpected behavior and should be avoided.")
+                else:
+                    continue
 
         return self.findings
 
@@ -110,12 +116,3 @@ class MainErrorHandlingCheck:
                                          f"and to try to optimize it.")
 
         return self.findings
-
-        # def check_retry_logic(self, workflow):
-    #     for job in workflow.jobs.items():
-    #         if job.strategy and not job.strategy.get('fail-fast'):
-    #             self.findings.append(
-    #                 f"Job '{job_name}' has retry logic but no 'max_attempts' set, which can "
-    #                 f"lead to undefined retry behavior.")
-    #
-    #     return self.findings

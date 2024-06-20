@@ -67,7 +67,7 @@ class Config:
                 return True
         return False
 
-    def reading_repos(self, row_number):
+    def reading_repos(self, url_column, file_column, total):
         """
         Reads the CSV file containing repository URLs.
 
@@ -78,8 +78,10 @@ class Config:
             reader = csv.reader(file)
             next(reader)
             for row in reader:
-                repo_url = row[int(row_number)]
-                yield repo_url
+                contains = row[file_column]
+                if int(contains) >= total:
+                    repo_url = row[url_column]
+                    yield repo_url
 
     @staticmethod
     def get_base_directory():

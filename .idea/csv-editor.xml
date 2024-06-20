@@ -3,21 +3,7 @@
   <component name="CsvFileAttributes">
     <option name="attributeMap">
       <map>
-        <entry key="/Miner/generated/database/commit_prisma.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/Miner/generated/database/gash_prisma.csv">
-          <value>
-            <Attribute>
-              <option name="separator" value="," />
-            </Attribute>
-          </value>
-        </entry>
-        <entry key="/Miner/generated/database/repos_dataset.csv">
+        <entry key="$PROJECT_DIR$/../Generated/DataSets/repos_dataset.csv">
           <value>
             <Attribute>
               <option name="separator" value="," />

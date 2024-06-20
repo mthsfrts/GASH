@@ -33,18 +33,18 @@ class MainUntrustedDependenciesCheck:
         # Check jobs level
         for job_name, job in content.jobs.items():
             logging.debug(f"Checking job level: {job_name}, uses: {job.uses}")
-            findings.extend(self._check_uses(job.uses, f'job {job_name}', self.token))
+            findings.extend(self._check_uses(job.uses, f'job {job_name}'))
 
             # Check steps level
             for step in job.steps:
                 logging.debug(f"Checking step level: {step.uses}")
-                findings.extend(self._check_uses(step.uses, f'step in job {job_name}', self.token))
+                findings.extend(self._check_uses(step.uses, f'step in job {job_name}'))
 
         return findings
 
-    def _check_uses(self, uses, level, token):
+    def _check_uses(self, uses, level):
         findings = []
-        call = self.api.GitHubAPI(token)
+        call = self.api.GitHubAPI(self.token)
 
         if uses:
             match = re.match(r'([^/]+)/([^@]+)@(.+)', uses)
