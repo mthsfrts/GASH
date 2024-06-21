@@ -4,7 +4,7 @@ import os
 import sys
 import re
 import shutil
-import  time
+import time
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urlparse
@@ -167,6 +167,7 @@ class Mining:
             "Added lines",
             "Deleted lines",
             "Token count",
+            "Pull Request",
             "Issue Tracker",
             "Issue Creator",
             "Issue Creator Acc type",
@@ -201,7 +202,7 @@ class Mining:
         # Updating path of the csv
         output_csv_path = os.path.join(dataset_dir, output_csv)
 
-        with (open(output_csv_path, mode='w', newline='', encoding='utf-8') as csvfile):
+        with open(output_csv_path, mode='w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(headers)
 
@@ -248,114 +249,170 @@ class Mining:
                         # Getting issue number
                         issue_tracker = Mining.extract_issue_numbers(commit.msg)
 
-                        for issue_number in issue_tracker:
+                        # getting commit info
+                        commit_gh = self.github_api.fetch_specific_commit(owner, repo_name, commit.hash)
 
-                            # getting commit info
-                            commit_gh = self.github_api.fetch_specific_commit(owner, repo_name, commit.hash)
+                        # Getting issue info if available
+                        issues = None
+                        if issue_tracker:
+                            issues = [self.github_api.fetch_specific_issues(owner, repo_name, issue_number) for
+                                      issue_number in issue_tracker]
 
-                            # getting issue info
-                            issues = self.github_api.fetch_specific_issues(owner, repo_name, issue_number)
-
-                            # smell analysis
-                            if modification.change_type.name != "DELETE":
-                                file = os.path.join(base_dir, current_filepath)
-                                action = self.parser.Action(file_path=file)
-                                workflow = action.prepare_for_analysis()
-
-                                codereplica = CodeReplicaFct(workflow).detect()
-                                errorhandling = ErrorHandlingFct(workflow).detect()
-                                misconfiguration = MisconfigurationFct(workflow).detect()
-                                longblock = LongBlockFct(workflow).detect()
-                                adminbydefault = AdminByDefaultFct(workflow).detect()
-                                hardcoded = HardCodedFct(workflow).detect()
-                                triggers = RemoteRunFct(workflow).detect()
-                                unsecureprotocol = UnsecureProtocolFct(workflow).detect()
-                                untrusteddependencies = UntrustedDependenciesFct(workflow, self.token).detect()
-
-                            if issues:  # checking if that commit is really an issue
-                                issue_creator = issues[0]['Creator']
-                                issue_creator_association = issues[0]['Creator association']
-                                issue_creator_type = issues[0]['Creator type']
-                                issue_created_at = issues[0]['Created At']
-                                issue_closed_at = issues[0]['Closed At']
-                                issue_state = issues[0]['State']
-                                issue_body = issues[0]['Body']
-                                issue_closer = issues[0]['Closer']
-                                issue_closer_type = issues[0]['Closer type']
-                                issue_labels = issues[0]['Labels']
-                                issue_reviewers = issues[0]['Reviewers/Assignees']
-                                issue_reviewers_type = issues[0]['Reviewers/Assignees type']
-                                # is_pull_request = issues[0]['Is Pull Request']
-                                issue_milestone = issues[0]['Milestone']
-                                auth_acc_type = commit_gh[0]['Author Acc']
-                                comt_acc_type = commit_gh[0]['Committer Acc']
-
-                                writer.writerow([
-                                    commit.project_name,
-                                    commit.author.name,
-                                    auth_acc_type,
-                                    commit.author.email,
-                                    commit.committer.name,
-                                    comt_acc_type,
-                                    commit.committer.email,
-                                    commit.hash,
-                                    commit.parents[-1] if commit.parents else None,
-                                    commit.committer_date,
-                                    commit.msg,
-                                    commit.files,
-                                    issue_milestone,
-                                    modification.filename,
-                                    modification.change_type.name,
-                                    modification.added_lines,
-                                    modification.deleted_lines,
-                                    modification.token_count,
-                                    ','.join(issue_tracker),
-                                    issue_creator,
-                                    issue_creator_type,
-                                    issue_creator_association,
-                                    issue_closer,
-                                    issue_closer_type,
-                                    issue_created_at,
-                                    issue_closed_at,
-                                    issue_state,
-                                    issue_labels,
-                                    issue_reviewers,
-                                    issue_reviewers_type,
-                                    issue_body,
-                                    os.path.join(base_dir, current_filepath),
-                                    os.path.join(base_dir, before_filepath),
-                                    os.path.join(base_dir, after_filepath),
-                                    self.handler.handle_none(commit.dmm_unit_size),
-                                    self.handler.handle_none(commit.dmm_unit_complexity),
-                                    self.handler.handle_none(commit.dmm_unit_interfacing),
-                                    codereplica,
-                                    errorhandling,
-                                    misconfiguration,
-                                    longblock,
-                                    adminbydefault,
-                                    hardcoded,
-                                    triggers,
-                                    unsecureprotocol,
-                                    untrusteddependencies,
-                                    modification.diff
-                                ])
-
-                                logging.info(f"Project: {commit.project_name}")
-                                logging.info(f"Author: {commit.author.name}")
-                                logging.info(f"Committer: {commit.committer.name}")
-                                logging.info(f"File: {modification.filename}")
-                                logging.info(f"Message: {commit.msg}")
-                                logging.info(f"Modification Type: {modification.change_type.name}")
-                                logging.info(f"Issues: {len(issue_tracker)}")
-                                logging.info(f"Issue Labels: {issue_labels}")
-                                logging.info(f"Created At: {issue_created_at}")
-                                logging.info(f"Closed At: {issue_closed_at}")
-                                logging.info(f"State: {issue_state}")
-                                logging.info(f"Release: {issue_milestone}")
-                                logging.info("-" * 40)
-
+                        # Smell analysis
+                        if modification.change_type.name != "DELETE":
+                            file_path = current_filepath
+                            if os.path.exists(file_path):
+                                action = self.parser.Action(file_path=file_path)
                             else:
-                                logging.warning(f"No issue generated found for issue numbers: {issue_tracker}")
+                                with open(after_filepath, 'r', encoding='utf-8') as file:
+                                    file_content = file.read()
+                                action = self.parser.Action(content=file_content)
+
+                            workflow = action.prepare_for_analysis()
+
+                            if workflow:
+                                codereplica = bool(CodeReplicaFct(workflow).detect())
+                                errorhandling = bool(ErrorHandlingFct(workflow).detect())
+                                misconfiguration = bool(MisconfigurationFct(workflow).detect())
+                                longblock = bool(LongBlockFct(workflow).detect())
+                                adminbydefault = bool(AdminByDefaultFct(workflow).detect())
+                                hardcoded = bool(HardCodedFct(workflow).detect())
+                                triggers = bool(RemoteRunFct(workflow).detect())
+                                unsecureprotocol = bool(UnsecureProtocolFct(workflow).detect())
+
+                                # Retrying untrusted dependencies
+                                attempts = 0
+                                while attempts < 3:
+                                    try:
+                                        untrusteddependencies = bool(
+                                            UntrustedDependenciesFct(workflow, self.token).detect())
+                                        break
+                                    except Exception as e:
+                                        logging.error(f"Error processing untrusted dependencies detector. "
+                                                      f"Attempt {attempts + 1} of 3. Error: {e}")
+                                        attempts += 1
+                                        if attempts < 3:
+                                            logging.info(f"Retrying in {10 * attempts} seconds...")
+                                            time.sleep(10 * attempts)
+                                        else:
+                                            if e == 404:
+                                                logging.error(f"Failed to process the {modification.filename} "
+                                                              f"file for untrusted dependencies. "
+                                                              f"Dependency were not found, "
+                                                              f"check if the name of dependency is right.")
+                                                untrusteddependencies = True
+                                            else:
+                                                logging.error(f"Failed to process the {modification.filename} "
+                                                              f"file for untrusted dependencies after 3 attempts. "
+                                                              f"The dependency will be considered as untrusted."
+                                                              f"Moving to the next one.")
+                                                untrusteddependencies = True
+                            else:
+                                logging.error(f"Failed to prepare workflow for analysis from file: {file_path}")
+                                continue
+
+                        if commit_gh:
+                            auth_acc_type = commit_gh[0]['Author Acc']
+                            comt_acc_type = commit_gh[0]['Committer Acc']
+                        else:
+                            auth_acc_type = None
+                            comt_acc_type = None
+
+                        if issues:
+                            issue_creator = issues[0]['Creator']
+                            issue_creator_association = issues[0]['Creator association']
+                            issue_creator_type = issues[0]['Creator type']
+                            issue_created_at = issues[0]['Created At']
+                            issue_closed_at = issues[0]['Closed At']
+                            issue_state = issues[0]['State']
+                            issue_body = issues[0]['Body']
+                            issue_closer = issues[0]['Closer']
+                            issue_closer_type = issues[0]['Closer type']
+                            issue_labels = issues[0]['Labels']
+                            issue_reviewers = issues[0]['Reviewers/Assignees']
+                            issue_reviewers_type = issues[0]['Reviewers/Assignees type']
+                            is_pull_request = issues[0]['Is Pull Request']
+                            issue_milestone = issues[0]['Milestone']
+                        else:
+                            issue_creator = None
+                            issue_creator_association = None
+                            issue_creator_type = None
+                            issue_created_at = None
+                            issue_closed_at = None
+                            issue_state = None
+                            issue_body = None
+                            issue_closer = None
+                            issue_closer_type = None
+                            issue_labels = None
+                            issue_reviewers = None
+                            issue_reviewers_type = None
+                            is_pull_request = None
+                            issue_milestone = None
+
+                        writer.writerow([
+                            commit.project_name,
+                            commit.author.name,
+                            auth_acc_type,
+                            commit.author.email,
+                            commit.committer.name,
+                            comt_acc_type,
+                            commit.committer.email,
+                            commit.hash,
+                            commit.parents[-1] if commit.parents else None,
+                            commit.committer_date,
+                            commit.msg,
+                            commit.files,
+                            issue_milestone,
+                            modification.filename,
+                            modification.change_type.name,
+                            modification.added_lines,
+                            modification.deleted_lines,
+                            modification.token_count,
+                            is_pull_request,
+                            ','.join(issue_tracker),
+                            issue_creator,
+                            issue_creator_type,
+                            issue_creator_association,
+                            issue_closer,
+                            issue_closer_type,
+                            issue_created_at,
+                            issue_closed_at,
+                            issue_state,
+                            issue_labels,
+                            issue_reviewers,
+                            issue_reviewers_type,
+                            issue_body,
+                            os.path.join(base_dir, current_filepath),
+                            os.path.join(base_dir, before_filepath),
+                            os.path.join(base_dir, after_filepath),
+                            self.handler.handle_none(commit.dmm_unit_size),
+                            self.handler.handle_none(commit.dmm_unit_complexity),
+                            self.handler.handle_none(commit.dmm_unit_interfacing),
+                            codereplica,
+                            errorhandling,
+                            misconfiguration,
+                            longblock,
+                            adminbydefault,
+                            hardcoded,
+                            triggers,
+                            unsecureprotocol,
+                            untrusteddependencies,
+                            modification.diff
+                        ])
+
+                        logging.info(f"Project: {commit.project_name}")
+                        logging.info(f"Author: {commit.author.name}")
+                        logging.info(f"Committer: {commit.committer.name}")
+                        logging.info(f"File: {modification.filename}")
+                        logging.info(f"Message: {commit.msg}")
+                        logging.info(f"Modification Type: {modification.change_type.name}")
+                        logging.info(f"Issues: {len(issue_tracker)}")
+                        logging.info(f"Issue Labels: {issue_labels}")
+                        logging.info(f"Created At: {issue_created_at}")
+                        logging.info(f"Closed At: {issue_closed_at}")
+                        logging.info(f"State: {issue_state}")
+                        logging.info(f"Release: {issue_milestone}")
+                        logging.info("-" * 40)
 
             logging.info("Dataset Created.")
 
@@ -388,5 +445,3 @@ class Mining:
                         logging.error(f"Failed to process repository {repo_url} "
                                       f"after 3 attempts. Moving to the next one.")
             time.sleep(30)
-
-
