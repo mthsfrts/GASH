@@ -85,6 +85,11 @@ class MainErrorHandlingCheck:
                                      f"It is recommended to set a timeout for jobs to prevent them from running "
                                      f"with the default value of 6 hours and consuming resources unnecessarily.")
 
+            elif job.timeout_minutes is not int:
+                self.findings.append(f"Job '{job_name}' has a different timeout variable value. This could be a string/"
+                                     f"boolean or a input that is passing from the remote triggers. "
+                                     f"Configure the timeout variable to a integer value to avoid unexpected behavior.")
+
             elif job.timeout_minutes == 1:
                 self.findings.append(f"Job '{job_name}' has a timeout of {job.timeout_minutes} min. "
                                      f"This is a short time for a job to run. If the timeout have a short value, "
@@ -102,6 +107,12 @@ class MainErrorHandlingCheck:
                     self.findings.append(f"Step '{step.name}' does not have a timeout set. "
                                          f"It is recommended to set a timeout for steps to prevent them from running "
                                          f"with the default value of 6 hours and consuming resources unnecessarily.")
+
+                elif step.timeout_minutes is not int:
+                    self.findings.append(f"Step '{step.name}'has a different timeout variable value. "
+                                         f"This could be a string/ boolean or a input that is passing from the remote "
+                                         f"triggers. Configure the timeout variable to a integer value to avoid "
+                                         f"unexpected behavior.")
 
                 elif step.timeout_minutes == 1:
                     self.findings.append(f"Step '{step.name}' has a timeout of {step.timeout_minutes} min. "

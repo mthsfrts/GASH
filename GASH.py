@@ -109,15 +109,11 @@ class GASH:
             'batch-commit',
             help='--file: CSV File Path '
                  '--url: Column Number '
-                 '--count: Column Number '
-                 '--total: Desired File Count, '
                  'Mine GitHub repositories commits in batches from a CSV file.',
             description='Mine all commits in GitHub repositories from a list of URLs.'
         )
         parser_batch.add_argument('--file', type=str, help='CSV file path containing GitHub repositories URL to mine.')
         parser_batch.add_argument('--url', type=int, help='Column number containing the URLs.')
-        parser_batch.add_argument('--count', type=int, help='Column number containing the file count.')
-        parser_batch.add_argument('--min', type=int, help='The total number that you want filter the files.')
 
         # Subcommand for analyzing smells
         parser_analyze = subparsers.add_parser(
@@ -134,7 +130,7 @@ class GASH:
             description='Analyze all GitHub Actions files in the specified directory for smells.'
         )
         parser_batch_analyze.add_argument('--dir', type=str,
-                                          help='Root directory path containing GitHub Actions files to analyze.')
+                                          help='Directory path containing GitHub Actions files to analyze.')
 
         parser.add_argument('-d', '--daemon', action='store_true', help='Run as a daemon in the background')
 
@@ -223,17 +219,13 @@ class GASH:
         elif args.command == 'batch-commit':
             _file = args.file
             url_column = args.url
-            file_count = args.count
-            _min = args.min
 
-            if _file is None or url_column is None or file_count is None or _min is None:
+            if _file is None or url_column is None:
                 readline.set_completer_delims(' \t\n;')
                 readline.parse_and_bind("tab: complete")
                 readline.set_completer(complete_path)
                 _file = input('Please provide a csv file path: ')
                 url_column = input('Please provide a column number that contains the URLs: ')
-                file_count = input('Please  provide a column number that contains the file count:')
-                _min = input('Please provide minimum number of file you desire to filter the projects:')
 
             if not os.path.exists(_file):
                 print(f"File not found: {_file}")
@@ -241,7 +233,7 @@ class GASH:
 
             print(f'Mining repositories listed in the file: {_file}')
             worker = self.miner.Mining(_token)
-            worker.batch(f'{_file}', url_column, file_count, _min)
+            worker.batch(f'{_file}', url_column)
 
         elif args.command == 'analyze':
             _file = args.file
@@ -271,7 +263,7 @@ class GASH:
         elif args.command == 'batch-analyze':
             _dir = args.dir
 
-            repo_dirs = glob.glob(os.path.join(_dir, 'Scripts', '*', 'CurrentCode'), recursive=True)
+            repo_dirs = glob.glob(_dir, recursive=True)
 
             if not repo_dirs:
                 print(f"No repositories found in directory: {_dir}")
@@ -287,12 +279,14 @@ class GASH:
 
                 analysis_dir = os.path.join(os.path.dirname(repo_dir), 'GashAnalyses')
                 os.makedirs(analysis_dir, exist_ok=True)
+                print(f"Starting analysis for {len(yaml_files)} "
+                      f"GitHub Actions files in directory: {repo_dir}\n")
 
                 for file_path in yaml_files:
                     file_root, file_ext = os.path.splitext(os.path.basename(file_path))
                     log_file_path = os.path.join(analysis_dir, f'{file_root}.log')
+                    print(f"Analyzing GitHub Actions file: {file_path}\n")
                     with open(log_file_path, 'w') as log_file:
-                        log_file.write(f"Analyzing GitHub Actions file: {file_path}\n")
                         action = self.parser.Action(file_path=file_path)
                         workflow = action.prepare_for_analysis()
 
@@ -305,8 +299,8 @@ class GASH:
                                 print(f"Error initializing detectors: {e}")
                                 attempts += 1
                                 if attempts < 3:
-                                    print(f"Retrying in {10 * attempts} seconds...")
-                                    time.sleep(10 * attempts)
+                                    print(f"Retrying in {3 * attempts} seconds...")
+                                    time.sleep(3 * attempts)
                                 else:
                                     print(f"Failed to initialize detectors after {attempts} attempts. Skipping file.")
                                     log_file.write(
@@ -325,7 +319,7 @@ class GASH:
                                         detection_attempts += 1
                                         if detection_attempts < 3:
                                             print(f"Retrying detection in {10 * detection_attempts} seconds...")
-                                            time.sleep(10 * detection_attempts)
+                                            time.sleep(3 * detection_attempts)
                                         else:
                                             print(
                                                 f"Failed to detect with {detector_name} after {detection_attempts} "

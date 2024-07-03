@@ -29,7 +29,7 @@ class MainRemoteRunCheck:
             workflow: A Workflow object representing the GitHub Actions workflows.
         """
 
-        if 'workflow_dispatch' in workflow.on and not None:
+        if 'workflow_dispatch' in workflow.on and not None and 'workflow_dispatch' is dict:
             dispatch = workflow.on['workflow_dispatch']
             branches = workflow.on.get('push', {}).get('branches', [])
             permissions = workflow.permissions
@@ -108,7 +108,9 @@ class MainRemoteRunCheck:
                 else:
                     self.findings.append("No inputs defined for workflow dispatch. Consider add some inputs to better "
                                          "security and maintenance.")
-
+        else:
+            self.findings.append("No workflow dispatch trigger found or configured incorrectly. "
+                                 "Please review the current configuration and ensure a secure setup.")
         return self.findings
 
     def check_call(self, workflow):

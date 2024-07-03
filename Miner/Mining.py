@@ -268,6 +268,61 @@ class Mining:
                                     file_content = file.read()
                                 action = self.parser.Action(content=file_content)
 
+                            if commit_gh:
+                                auth_acc_type = commit_gh[0]['Author Acc']
+                                comt_acc_type = commit_gh[0]['Committer Acc']
+                            else:
+                                auth_acc_type = None
+                                comt_acc_type = None
+
+                            if issues:
+                                if isinstance(issues[0], dict):
+                                    issue_creator = issues[0]['Creator']
+                                    issue_creator_association = issues[0]['Creator association']
+                                    issue_creator_type = issues[0]['Creator type']
+                                    issue_created_at = issues[0]['Created At']
+                                    issue_closed_at = issues[0]['Closed At']
+                                    issue_state = issues[0]['State']
+                                    issue_body = issues[0]['Body']
+                                    issue_closer = issues[0]['Closer']
+                                    issue_closer_type = issues[0]['Closer type']
+                                    issue_labels = issues[0]['Labels']
+                                    issue_reviewers = issues[0]['Reviewers/Assignees']
+                                    issue_reviewers_type = issues[0]['Reviewers/Assignees type']
+                                    is_pull_request = issues[0]['Is Pull Request']
+                                    issue_milestone = issues[0]['Milestone']
+                                else:
+                                    issue_creator = None
+                                    issue_creator_association = None
+                                    issue_creator_type = None
+                                    issue_created_at = None
+                                    issue_closed_at = None
+                                    issue_state = None
+                                    issue_body = None
+                                    issue_closer = None
+                                    issue_closer_type = None
+                                    issue_labels = None
+                                    issue_reviewers = None
+                                    issue_reviewers_type = None
+                                    is_pull_request = None
+                                    issue_milestone = None
+
+                            else:
+                                issue_creator = None
+                                issue_creator_association = None
+                                issue_creator_type = None
+                                issue_created_at = None
+                                issue_closed_at = None
+                                issue_state = None
+                                issue_body = None
+                                issue_closer = None
+                                issue_closer_type = None
+                                issue_labels = None
+                                issue_reviewers = None
+                                issue_reviewers_type = None
+                                is_pull_request = None
+                                issue_milestone = None
+
                             workflow = action.prepare_for_analysis()
 
                             if workflow:
@@ -310,44 +365,6 @@ class Mining:
                             else:
                                 logging.error(f"Failed to prepare workflow for analysis from file: {file_path}")
                                 continue
-
-                        if commit_gh:
-                            auth_acc_type = commit_gh[0]['Author Acc']
-                            comt_acc_type = commit_gh[0]['Committer Acc']
-                        else:
-                            auth_acc_type = None
-                            comt_acc_type = None
-
-                        if issues:
-                            issue_creator = issues[0]['Creator']
-                            issue_creator_association = issues[0]['Creator association']
-                            issue_creator_type = issues[0]['Creator type']
-                            issue_created_at = issues[0]['Created At']
-                            issue_closed_at = issues[0]['Closed At']
-                            issue_state = issues[0]['State']
-                            issue_body = issues[0]['Body']
-                            issue_closer = issues[0]['Closer']
-                            issue_closer_type = issues[0]['Closer type']
-                            issue_labels = issues[0]['Labels']
-                            issue_reviewers = issues[0]['Reviewers/Assignees']
-                            issue_reviewers_type = issues[0]['Reviewers/Assignees type']
-                            is_pull_request = issues[0]['Is Pull Request']
-                            issue_milestone = issues[0]['Milestone']
-                        else:
-                            issue_creator = None
-                            issue_creator_association = None
-                            issue_creator_type = None
-                            issue_created_at = None
-                            issue_closed_at = None
-                            issue_state = None
-                            issue_body = None
-                            issue_closer = None
-                            issue_closer_type = None
-                            issue_labels = None
-                            issue_reviewers = None
-                            issue_reviewers_type = None
-                            is_pull_request = None
-                            issue_milestone = None
 
                         writer.writerow([
                             commit.project_name,
@@ -416,20 +433,18 @@ class Mining:
 
             logging.info("Dataset Created.")
 
-    def batch(self, file, url, count, desired):
+    def batch(self, file, url):
         """
         Responsible for mining commits from a batch of repositories.
 
         Attributes:
             file: CSV file with the repositories URLs.
             url: Column number with the repositories URLs.
-            count: Column number with the total of yaml files.
-            desired: The total number of files that will filter the repositories to be mined.
 
         Returns: CSV file with the commit info.
         """
         csv_file = self.handler(file)
-        for repo_url in self.handler.reading_repos(csv_file, url, count, desired):
+        for repo_url in self.handler.reading_repos(csv_file, url):
             attempts = 0
             while attempts < 3:
                 try:
@@ -439,9 +454,9 @@ class Mining:
                     logging.error(f"Error processing repository {repo_url}. Attempt {attempts + 1} of 3. Error: {e}")
                     attempts += 1
                     if attempts < 3:
-                        logging.info(f"Retrying in {10 * attempts} seconds...")
-                        time.sleep(10 * attempts)
+                        logging.info(f"Retrying in {3 * attempts} seconds...")
+                        time.sleep(3 * attempts)
                     else:
                         logging.error(f"Failed to process repository {repo_url} "
                                       f"after 3 attempts. Moving to the next one.")
-            time.sleep(30)
+            time.sleep(10)
