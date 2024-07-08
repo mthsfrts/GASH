@@ -31,8 +31,8 @@ class GitHubAPI:
             return response.status_code
 
     def has_workflow_files(self, repo_full_name):
-        """Returns the names of the .yml or .yaml Parser in the
-        .GitHub/workflows folder, or None if there are no Parser."""
+        """Returns the names of the .yml or .yaml files in the
+        .GitHub/workflows folder, or None if there are no file."""
         workflows_url = f"https://api.github.com/repos/{repo_full_name}/contents/.github/workflows"
         response = requests.get(workflows_url, headers=self.headers)
         if response.status_code == 200:
@@ -108,7 +108,7 @@ class GitHubAPI:
             commit_author_type = commit['author']['type'] if commit['author'] else None
             commit_committer_type = commit['committer']['type'] if commit['committer'] else None
             commit_tree = commit['commit']['tree']['sha']
-            commit_files = [files['filename'] for files in commit['Parser']]
+            commit_files = [files['filename'] for files in commit['files']]
 
             logging.info(f"Getting Additional Info From Commit: {commit_sha}")
 
@@ -203,7 +203,7 @@ class GitHubAPI:
             url_bs = f"https://github.com/marketplace/actions/{action_name}"
             response_bs = requests.get(url_bs)
             if response_bs.status_code == 404:
-                # logging.warning(f"GitHub Action marketplace page not found for action: {action_name}")
+                logging.warning(f"GitHub Action marketplace page not found for action: {action_name}")
                 verification_badge = False
             else:
                 response_bs.raise_for_status()
@@ -224,7 +224,11 @@ class GitHubAPI:
         response.raise_for_status()
 
         if response.status_code == 200:
-            return json.dumps(response.json(), indent=4)
+            vulnerabilities = response.json()
+            if vulnerabilities:
+                return json.dumps(vulnerabilities, indent=4)
+            else:
+                return None
         else:
             logging.error(f"Error fetching vulnerabilities: {response.text}")
             return None

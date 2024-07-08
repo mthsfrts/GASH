@@ -192,31 +192,25 @@ steps:
    - **Mitigation**: Use GitHub secrets to store sensitive information. Regularly check for the presence of secrets in the code.
    - **Justification**: Exposing secrets directly in the code can lead to critical data leaks, making the system vulnerable to attacks.
 
-2. **Security Flaws**
-   - **Description**: Improper configurations that allow unauthorized access or compromise the pipeline's integrity.
-   - **Vulnerability Level**: Critical
-   - **Mitigation**: Regularly review the permissions. Implement robust security practices.
-   - **Justification**: High permissions can open doors to a wide range of attacks, compromising the pipeline's integrity and data.
-
-3. **Unsecure Protocol**
+2. **Unsecure Protocol**
    - **Description**: Using secure protocol for communication.
    - **Vulnerability Level**: Critical
    - **Mitigation**: Ensure all URLs used in scripts use HTTPS.
    - **Justification**: Unencrypted communications are susceptible to man-in-the-middle attacks, exposing sensitive data.
 
-4. **Untrusted Dependencies**
+3. **Untrusted Dependencies**
    - **Description**: Including dependencies from unverified or untrusted sources.
    - **Vulnerability Level**: Critical
    - **Mitigation**: Verify the reputation and security of dependencies before using them. Keep dependencies up to date.
    - **Justification**: Insecure dependencies can introduce vulnerabilities through third-party code.
 
-5. **Admin by Default**
+4. **Admin by Default**
     - **Description**: Assigning admin privileges to all users by default.
     - **Vulnerability Level**: Critical
     - **Mitigation**: Assign permissions based on the principle of least privilege.
     - **Justification**: Admin privileges grant extensive control over the repository, increasing the risk of unauthorized access and data breaches.
 
-6. **Remote Triggers**
+5. **Remote Triggers**
     - **Description**: Allowing remote triggers without proper configuration.
     - **Vulnerability Level**: Critical
     - **Mitigation**: Implement secure configuration mechanisms for remote triggers.
@@ -224,9 +218,9 @@ steps:
 
 ### Category: Maintenance and Reliability
 
-1. **Duplicated Code**
-   - **Description**: Duplicated code snippets in different parts of the pipeline.
-   - **Vulnerability Level**: Medium
+1. **Replicated Code**
+   - **Description**: Replicated code snippets in different parts of the pipeline.
+   - **Vulnerability Level**: Low
    - **Mitigation**: Refactor duplicated code into reusable workflows or actions.
    - **Justification**: Increases complexity and hinders maintenance but does not directly compromise security.
 

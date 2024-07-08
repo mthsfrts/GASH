@@ -40,6 +40,8 @@ class MainErrorHandlingCheck:
                                      f"This could be useful in some cases, but it is generally not recommended."
                                      f"Meaning that the job will continue to run even if a step fails. "
                                      f"This can lead to unexpected behavior and should be avoided.")
+            else:
+                continue
 
             for step in job.steps:
                 if step.continue_on_error:
@@ -47,6 +49,8 @@ class MainErrorHandlingCheck:
                                          f"This could be useful in some cases, but it is generally not recommended."
                                          f"Meaning that the step will continue to run even if it fails. "
                                          f"This can lead to unexpected behavior and should be avoided.")
+                else:
+                    continue
 
         return self.findings
 
@@ -56,12 +60,14 @@ class MainErrorHandlingCheck:
         """
 
         for job_name, job in workflow.jobs.items():
-            if job.strategy:
+            if 'fail-fast' in job.strategy:
                 failfast = job.strategy['fail-fast']
-                if failfast not in [True, 'True', 'true']:
+                if failfast not in [False, 'false', 'False']:
                     self.findings.append(f"Job '{job.name}' has fail-fast set to {failfast}. "
                                          f"This means that the job will continue to run even if a step fails. "
                                          f"This can lead to unexpected behavior and should be avoided.")
+                else:
+                    continue
 
         return self.findings
 
@@ -78,6 +84,11 @@ class MainErrorHandlingCheck:
                 self.findings.append(f"Job '{job_name}' does not have a timeout set. "
                                      f"It is recommended to set a timeout for jobs to prevent them from running "
                                      f"with the default value of 6 hours and consuming resources unnecessarily.")
+
+            elif job.timeout_minutes is not int:
+                self.findings.append(f"Job '{job_name}' has a different timeout variable value. This could be a string/"
+                                     f"boolean or a input that is passing from the remote triggers. "
+                                     f"Configure the timeout variable to a integer value to avoid unexpected behavior.")
 
             elif job.timeout_minutes == 1:
                 self.findings.append(f"Job '{job_name}' has a timeout of {job.timeout_minutes} min. "
@@ -97,6 +108,12 @@ class MainErrorHandlingCheck:
                                          f"It is recommended to set a timeout for steps to prevent them from running "
                                          f"with the default value of 6 hours and consuming resources unnecessarily.")
 
+                elif step.timeout_minutes is not int:
+                    self.findings.append(f"Step '{step.name}'has a different timeout variable value. "
+                                         f"This could be a string/ boolean or a input that is passing from the remote "
+                                         f"triggers. Configure the timeout variable to a integer value to avoid "
+                                         f"unexpected behavior.")
+
                 elif step.timeout_minutes == 1:
                     self.findings.append(f"Step '{step.name}' has a timeout of {step.timeout_minutes} min. "
                                          f"This is a short time for a step to run. If the timeout have a short value, "
@@ -110,12 +127,3 @@ class MainErrorHandlingCheck:
                                          f"and to try to optimize it.")
 
         return self.findings
-
-        # def check_retry_logic(self, workflow):
-    #     for job in workflow.jobs.items():
-    #         if job.strategy and not job.strategy.get('fail-fast'):
-    #             self.findings.append(
-    #                 f"Job '{job_name}' has retry logic but no 'max_attempts' set, which can "
-    #                 f"lead to undefined retry behavior.")
-    #
-    #     return self.findings
