@@ -50,7 +50,7 @@ class MainLongBlockCheck:
 
             for step in job.steps:
                 if step.run is None:
-                    self.findings.append(f"The step '{step.name}' does not have any commands to run.")
+                    continue
                 else:
                     commands_count = len(step.run.split('\n'))
                     if commands_count > self.max_commands_per_step:

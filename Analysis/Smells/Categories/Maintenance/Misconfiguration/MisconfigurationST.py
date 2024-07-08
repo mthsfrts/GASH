@@ -178,9 +178,4 @@ class MainMisconfigurationCheck:
                         f"Ensure cancel-in-progress has the right configuration.")
 
         else:
-            self.findings.append(
-                "Concurrency configuration is empty or missing. "
-                "Consider create to get better security and maintenance "
-                "or specifying the main parameters 'group' and 'cancel-in-progress'.")
-
-        return self.findings
+            return self.findings

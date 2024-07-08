@@ -43,10 +43,21 @@ class MainHardCodedCheck:
             logging.debug(f"Checking job level: {job_name}, env: {job.env}")
             findings.extend(self._check_env(job.env, f'job {job_name}'))
 
+            # Check services level
+            if job.services:
+                for service_name, service in job.services.items():
+                    logging.debug(f"Checking service level: {service_name}")
+                    if 'env' in service:
+                        findings.extend(self._check_env(service['env'], f'service {service_name} in job {job_name}'))
+                    if 'credentials' in service:
+                        findings.extend(
+                            self._check_env(service['credentials'], f'service {service_name} in job {job_name}'))
+
             # Check steps level
             for step in job.steps:
                 logging.debug(f"Checking step level: {step.env}")
                 findings.extend(self._check_env(step.env, f'step in job {job_name}'))
+
                 if step.run:
                     logging.debug(f"Checking run command: {step.run}")
                     findings.extend(self._check_run(step.run, f'step in job {job_name}'))
@@ -56,12 +67,14 @@ class MainHardCodedCheck:
     def _check_env(self, env, level):
         findings = []
         for key, value in env.items():
-            value_str = str(value)
-            if any(pattern.search(value_str) for pattern in self.regex) and not self.safe_pattern.search(value_str):
+            value_str = str(value).lower()
+            key_str = str(key).lower()
+            if (any(pattern.search(key_str) for pattern in self.regex)
+                    and not self.safe_pattern.search(value_str)):
                 findings.append(f"Hard-coded secret in {level} env '{key}'")
-            elif any(
-                    keyword.lower() in value_str.lower() for keyword in self.keywords) and not self.safe_pattern.search(
-                    value_str):
+            elif (any(
+                    keyword.lower() in key_str for keyword in self.keywords)
+                  and not self.safe_pattern.search(value_str)):
                 findings.append(f"Hard-coded secret in {level} env '{key}'")
         return findings
 

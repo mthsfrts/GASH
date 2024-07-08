@@ -126,7 +126,7 @@ class GASH:
 
         parser_batch_analyze = subparsers.add_parser(
             'batch-analyze',
-            help='--dir: Root Directory Path, Analyze all GitHub Actions files in the specified directory for smells.',
+            help='--dir: Directory Path, Analyze all GitHub Actions files for smells in a specific directory.',
             description='Analyze all GitHub Actions files in the specified directory for smells.'
         )
         parser_batch_analyze.add_argument('--dir', type=str,

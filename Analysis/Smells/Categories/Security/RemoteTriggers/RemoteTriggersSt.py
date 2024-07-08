@@ -109,9 +109,7 @@ class MainRemoteRunCheck:
                     self.findings.append("No inputs defined for workflow dispatch. Consider add some inputs to better "
                                          "security and maintenance.")
         else:
-            self.findings.append("No workflow dispatch trigger found or configured incorrectly. "
-                                 "Please review the current configuration and ensure a secure setup.")
-        return self.findings
+            return self.findings
 
     def check_call(self, workflow):
         """

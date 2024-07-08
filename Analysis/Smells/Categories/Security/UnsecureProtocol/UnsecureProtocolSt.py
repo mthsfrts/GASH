@@ -53,7 +53,7 @@ class MainUnsecureProtocolCheck:
             value_str = str(value)
             if self.pattern.search(value_str):
                 findings.append(f"Unsecure protocol found in {level} env '{key}': {value_str}. "
-                                f"Try use HTTPS instead of HTTP. If you need to use HTTP, "
+                                f"Try use HTTPS instead of HTTP. If you need to use HTTP "
                                 f"please provide certain level of security.")
         return findings
 
@@ -62,6 +62,6 @@ class MainUnsecureProtocolCheck:
         run_str = str(run)
         if self.pattern.search(run_str):
             findings.append(f"Unsecure protocol found in {level} run command '{run_str}'. "
-                            f"Try use HTTPS instead of HTTP. If you need to use HTTP, "
+                            f"Try use HTTPS instead of HTTP. If you need to use HTTP "
                             f"please provide certain level of security.")
         return findings
