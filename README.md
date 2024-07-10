@@ -1,3 +1,42 @@
+# GASH - GitHub Actions Smells Hunter
+## Overview
+
+GASH is a CI/CD pipeline analysis tool focused on GitHub Actions YAML files. It has two main use cases: research and development. In the research scenario, it provides historical analysis of the pipeline lifecycle. In the development scenario, it allows developers to analyze one or multiple YAML files without considering file versioning.
+
+GASH is used through a CLI with five options, covering both research and development scenarios.
+
+### Summary of GASH CLI Options
+
+| **Group**   | **Option**          | **Description**                                                                         |
+|-------------|---------------------|-----------------------------------------------------------------------------------------|
+| Research    | `repo`              | Mines repositories based on a search idea, used when a specific repository is not identified. |
+|             | `commits`           | Analyzes a specific repository's commits for configuration smells.                      |
+|             | `batch-commits`     | Studies multiple repositories listed in a CSV file.                                     |
+| Analysis    | `analyze`           | Performs single mode analysis on a specific YAML file, providing the file path.         |
+|             | `batch-analyze`     | Analyzes multiple YAML files within a specified directory.                              |
+
+## Usage
+
+To use GASH, you need to create a token on GitHub and install the required dependencies listed in the requirements file. This token is necessary for the tool's proper execution, as it is used for validating parameters such as rate limits and accessing the GitHub Advisory Database (GAD). The token will be stored locally for future use.
+
+1. Clone the repository:
+    ```bash
+    git clone git@github.com:mthsfrts/GASH.git
+    ```
+2. Enter the repository's root directory:
+    ```bash
+    cd GASH
+    ```
+3. Install the requirements:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+After installing the requirements, run `GASH.py` in the terminal:
+```bash
+python3 GASH.py
+```
+
 # GitHub Actions Syntax
 
 ## GitHub Actions Configuration Structure
@@ -163,9 +202,9 @@ steps:
 - [Workflow commands](https://docs.github.com/en/actions/learn-github-actions/workflow-commands-for-github-actions)
 - [Guides for GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/guides-for-github-actions)
 
-# List of Smells and Anti-Patterns in GitHub Actions
+# List of Smells
 
-## Smells Summary
+## Summary
 1. **Security**
    - Hard-Coded Secret
    - Security Flaws
@@ -183,7 +222,7 @@ steps:
     - Long Code Blocks
 
    
-## Detailed Smells
+## Detailed
 ### Category: Security
 
 1. **Hard-Coded Secret**
@@ -220,7 +259,7 @@ steps:
 
 1. **Replicated Code**
    - **Description**: Replicated code snippets in different parts of the pipeline.
-   - **Vulnerability Level**: Low
+   - **Vulnerability Level**: Medium
    - **Mitigation**: Refactor duplicated code into reusable workflows or actions.
    - **Justification**: Increases complexity and hinders maintenance but does not directly compromise security.
 
