@@ -21,7 +21,7 @@ To use GASH, you need to create a token on GitHub and install the required depen
 
 1. Clone the repository:
     ```bash
-    git clone git@github.com:mthsfrts/GASH.git
+    git clone git@github.com:xxxx/GASH.git
     ```
 2. Enter the repository's root directory:
     ```bash
