@@ -34,14 +34,14 @@ def test_admin_by_default_detection(workflow):
 
 
 def test_integration():
-    action = Action(file_path="../../Yamls/Smells/AdminByDefault.yaml")
+    action = Action(file_path="../../Yamls/Smells/Prisma/codeql-analysis.yml")
     workflow_ = action.prepare_for_analysis()
 
     factory = AdminByDefaultFct(content=workflow_)
     findings = factory.detect()
 
-    expected_findings = ['Elevate permission found at job build: actions = write-all. Review the '
-                         'permission and check if the user is qualified for that. Use the least '
-                         'privilege principle.']
+    expected_findings = ['Elevate permission found at job analyze: security-events = write. '
+                         'Review the permission and check if the user is qualified for that. '
+                         'Use the least privilege principle.']
 
     assert findings == expected_findings

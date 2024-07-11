@@ -43,7 +43,7 @@ def test_hard_coded_secret_detection(workflow):
 
 def test_integration():
     logging.debug("Running test_integration")
-    action = Action(file_path="../../Yamls/Smells/HardCoded.yaml")
+    action = Action(file_path="../../Yamls/Smells/Prisma/manage-dist-tag.yml")
     workflow = action.prepare_for_analysis()
     logging.debug(f"Parsed workflow: {workflow}")
 
@@ -52,10 +52,23 @@ def test_integration():
     logging.debug(f"Findings: {findings}")
 
     expected_findings = [
-        "Hard-coded secret in workflow env 'API_KEY'",
-        "Hard-coded secret in job build env 'DB_PASSWORD'",
-        "Hard-coded secret in step in job build env 'TOKEN'",
-        "Hard-coded secret in step in job build run command 'echo 'my_secret_key''"
+        "Hard-coded secret in step in job manage_tag run command 'echo "
+        '"//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc\n'
+        '\n'
+        'echo "The following commands will be executed, for example:"\n'
+        'echo "npm dist-tag \'${{ env.ACTION }}\' \'@prisma/client${{ env.VERSION '
+        '}}\' \'${{ env.TAG_NAME }}\'"\n'
+        '\n'
+        'sleep 10\n'
+        '\n'
+        'npm dist-tag "${{ env.ACTION }}" "@prisma/client${{ env.VERSION }}" "${{ '
+        'env.TAG_NAME }}"\n'
+        'npm dist-tag "${{ env.ACTION }}" "prisma${{ env.VERSION }}" "${{ '
+        'env.TAG_NAME }}"\n'
+        '\n'
+        'npm dist-tag "${{ env.ACTION }}" "@prisma/adapter-d1${{ env.VERSION }}" "${{ '
+        'env.TAG_NAME }}"\n'
+        "'"
     ]
 
     assert findings == expected_findings

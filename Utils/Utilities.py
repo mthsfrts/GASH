@@ -62,7 +62,7 @@ class Config:
             str: The URL of each repository read from the CSV file.
         """
         with open(self.csv_path, mode='r', newline='', encoding='utf-8') as file:
-            reader = csv.reader(file)
+            reader = csv.reader(file, delimiter=';')
             next(reader)
             for row in reader:
                 repo_url = row[url_column]

@@ -60,19 +60,35 @@ def test_unit(workflow):
 
 def test_integration():
     logging.debug("Running test_integration")
-    action = Action(file_path='../../Yamls/Smells/CodeReplica.yaml')
+    action = Action(file_path='../../Yamls/Smells/Prisma/release-latest.yml')
     workflow = action.prepare_for_analysis()
     factory = CodeReplicaFct(content=workflow)
     findings = factory.detect()
 
-    expected_findings = ["Job 'test' is replicated with job 'build'. Consider use reusable actions. "
-                         "You can find examples in the documentation: "
-                         "https://docs.github.com/en/actions/using-workflows/reusing-workflows",
-
-                         "Value '14' is replicated in contexts: Job 'build' env variable "
-                         "'NODE_VERSION', Step 'Setup Node.js' parameter 'node-version' in job 'build' "
-                         "is replicated. Consider use Defaults params. Ex: Defaults: 'node-version': "
-                         "'14'. If not an Env consider use Matrix to define versions. Ex: 'strategy: "
-                         "matrix: {'python': ['3.6', '3.7', '3.8']}'"]
+    expected_findings = [
+        "Value '${{ secrets.BOT_TOKEN }}' is replicated in contexts: Step 'Publish "
+        "all packages to npm' env variable 'GITHUB_TOKEN' in job 'release' is "
+        "replicated. Consider use Global Env variables: Ex: Env: 'GITHUB_TOKEN': '${{ "
+        "secrets.BOT_TOKEN }}', Step 'Create a tag on prisma-engines repository' "
+        "parameter 'github-token' in job 'release' is replicated. Consider use "
+        "Defaults params. Ex: Defaults: 'github-token': '${{ secrets.BOT_TOKEN }}'. "
+        "If not an Env consider use Matrix to define versions. Ex: 'strategy: matrix: "
+        "{'python': ['3.6', '3.7', '3.8']}'",
+        "Value '${{ secrets.SLACK_RELEASE_FEED_WEBHOOK }}' is replicated in contexts: "
+        "Step 'Publish all packages to npm' env variable 'SLACK_RELEASE_FEED_WEBHOOK' "
+        "in job 'release' is replicated. Consider use Global Env variables: Ex: Env: "
+        "'SLACK_RELEASE_FEED_WEBHOOK': '${{ secrets.SLACK_RELEASE_FEED_WEBHOOK }}', "
+        "Step 'Slack Notification on Success' env variable 'SLACK_WEBHOOK' in job "
+        "'success' is replicated. Consider use Global Env variables: Ex: Env: "
+        "'SLACK_WEBHOOK': '${{ secrets.SLACK_RELEASE_FEED_WEBHOOK }}'. If not an Env "
+        "consider use Matrix to define versions. Ex: 'strategy: matrix: {'python': "
+        "['3.6', '3.7', '3.8']}'",
+        "Value 'true' is replicated in contexts: Step 'Publish all packages to npm' "
+        "env variable 'BUILDKITE' in job 'release' is replicated. Consider use Global "
+        "Env variables: Ex: Env: 'BUILDKITE': 'true', Step 'Publish all packages to "
+        "npm' env variable 'NPM_CONFIG_PROVENANCE' in job 'release' is replicated. "
+        "Consider use Global Env variables: Ex: Env: 'NPM_CONFIG_PROVENANCE': 'true'. "
+        "If not an Env consider use Matrix to define versions. Ex: 'strategy: matrix: "
+        "{'python': ['3.6', '3.7', '3.8']}'"]
 
     assert sorted(findings) == sorted(expected_findings)

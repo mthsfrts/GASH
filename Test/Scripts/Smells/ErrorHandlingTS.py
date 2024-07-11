@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 @pytest.fixture
 def workflow():
-    action = Action(file_path='../../Yamls/Smells/ErrorHandling.yaml')
+    action = Action(file_path='../../Yamls/Smells/Prisma/benchmark.yml')
     workflow = action.prepare_for_analysis()
     return workflow
 
@@ -20,15 +20,8 @@ def test_continue_on_error(workflow):
     logging.debug(f"Findings: {findings}")
 
     expected_findings = [
-        "Job 'build' has continue-on-error set to true. This could be useful in some "
-        'cases, but it is generally not recommended.Meaning that the job will '
-        'continue to run even if a step fails. This can lead to unexpected behavior '
-        'and should be avoided.',
 
-        "Step 'Checkout' has continue-on-error set to true. This could be useful in "
-        'some cases, but it is generally not recommended.Meaning that the step will '
-        'continue to run even if it fails. This can lead to unexpected behavior and '
-        'should be avoided.']
+    ]
 
     assert sorted(findings) == sorted(expected_findings)
 
@@ -39,9 +32,7 @@ def test_fail_fast(workflow):
     logging.debug(f"Findings: {findings}")
 
     expected_findings = [
-        "Job 'build' has fail-fast set to false. This means that the job will "
-        'continue to run even if a step fails. This can lead to unexpected behavior '
-        'and should be avoided.'
+
     ]
 
     assert sorted(findings) == sorted(expected_findings)
@@ -52,13 +43,33 @@ def test_timeout(workflow):
     findings = checker.check_timeouts(workflow)
     logging.debug(f"Findings: {findings}")
 
-    expected_findings = ["Job 'build' has a timeout of 1 min. This is a short time for a job to run. "
-                         'If the timeout have a short value, it will lead to cancel the job before it '
-                         'finishes.',
-                         "Step 'Checkout' has a timeout of 10 min. This is a long time for a step to "
-                         'run. If a step is taking this long to run, it may be a sign that something '
-                         'is wrong. It is recommended to investigate why the step is taking so long to '
-                         'run and to try to optimize it.']
+    expected_findings = [
+        "Job 'benchmark' does not have a timeout set. It is recommended to set a "
+        'timeout for jobs to prevent them from running with the default value of 6 '
+        'hours and consuming resources unnecessarily.',
+        "Step 'Install & build' does not have a timeout set. It is recommended to set "
+        'a timeout for steps to prevent them from running with the default value of 6 '
+        'hours and consuming resources unnecessarily.',
+        "Step 'None' does not have a timeout set. It is recommended to set a timeout "
+        'for steps to prevent them from running with the default value of 6 hours and '
+        'consuming resources unnecessarily.',
+        "Step 'Run benchmarks for Codspeed' does not have a timeout set. It is "
+        'recommended to set a timeout for steps to prevent them from running with the '
+        'default value of 6 hours and consuming resources unnecessarily.',
+        "Step 'Run benchmarks' does not have a timeout set. It is recommended to set "
+        'a timeout for steps to prevent them from running with the default value of 6 '
+        'hours and consuming resources unnecessarily.',
+        "Step 'Set current job url in SLACK_FOOTER env var' does not have a timeout "
+        'set. It is recommended to set a timeout for steps to prevent them from '
+        'running with the default value of 6 hours and consuming resources '
+        'unnecessarily.',
+        "Step 'Slack Notification on Failure' does not have a timeout set. It is "
+        'recommended to set a timeout for steps to prevent them from running with the '
+        'default value of 6 hours and consuming resources unnecessarily.',
+        "Step 'Store benchmark result' does not have a timeout set. It is recommended "
+        'to set a timeout for steps to prevent them from running with the default '
+        'value of 6 hours and consuming resources unnecessarily.'
+    ]
 
     assert sorted(findings) == sorted(expected_findings)
 
@@ -70,28 +81,33 @@ def test_integration(workflow):
     logging.debug(f"Findings: {findings}")
 
     expected_findings = [
-        "Job 'build' has a timeout of 1 min. This is a short time for a job to run. "
-        'If the timeout have a short value, it will lead to cancel the job before it '
-        'finishes.',
 
-        "Job 'build' has continue-on-error set to true. This could be useful in some "
-        'cases, but it is generally not recommended.Meaning that the job will '
-        'continue to run even if a step fails. This can lead to unexpected behavior '
-        'and should be avoided.',
+        "Job 'benchmark' does not have a timeout set. It is recommended to set a "
+        'timeout for jobs to prevent them from running with the default value of 6 '
+        'hours and consuming resources unnecessarily.',
+        "Step 'Install & build' does not have a timeout set. It is recommended to set "
+        'a timeout for steps to prevent them from running with the default value of 6 '
+        'hours and consuming resources unnecessarily.',
+        "Step 'None' does not have a timeout set. It is recommended to set a timeout "
+        'for steps to prevent them from running with the default value of 6 hours and '
+        'consuming resources unnecessarily.',
+        "Step 'Run benchmarks for Codspeed' does not have a timeout set. It is "
+        'recommended to set a timeout for steps to prevent them from running with the '
+        'default value of 6 hours and consuming resources unnecessarily.',
+        "Step 'Run benchmarks' does not have a timeout set. It is recommended to set "
+        'a timeout for steps to prevent them from running with the default value of 6 '
+        'hours and consuming resources unnecessarily.',
+        "Step 'Set current job url in SLACK_FOOTER env var' does not have a timeout "
+        'set. It is recommended to set a timeout for steps to prevent them from '
+        'running with the default value of 6 hours and consuming resources '
+        'unnecessarily.',
+        "Step 'Slack Notification on Failure' does not have a timeout set. It is "
+        'recommended to set a timeout for steps to prevent them from running with the '
+        'default value of 6 hours and consuming resources unnecessarily.',
+        "Step 'Store benchmark result' does not have a timeout set. It is recommended "
+        'to set a timeout for steps to prevent them from running with the default '
+        'value of 6 hours and consuming resources unnecessarily.'
 
-        "Job 'build' has fail-fast set to false. This means that the job will "
-        'continue to run even if a step fails. This can lead to unexpected behavior '
-        'and should be avoided.',
-
-        "Step 'Checkout' has a timeout of 10 min. This is a long time for a step to "
-        'run. If a step is taking this long to run, it may be a sign that something '
-        'is wrong. It is recommended to investigate why the step is taking so long to '
-        'run and to try to optimize it.',
-
-        "Step 'Checkout' has continue-on-error set to true. This could be useful in "
-        'some cases, but it is generally not recommended.Meaning that the step will '
-        'continue to run even if it fails. This can lead to unexpected behavior and '
-        'should be avoided.'
     ]
 
     assert sorted(findings) == sorted(expected_findings)

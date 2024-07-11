@@ -94,7 +94,7 @@ class Mining:
         file_path = os.path.join(dataset_dir, filename)
 
         with open(file_path, mode='w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
+            writer = csv.writer(file, delimiter=';')
             headers = ["Owner", "Repo", "Description", "URL", "Language", "Stars", "Open Issues count",
                        "Created At", "Updated At", "Size", "Has Downloads", "YML count", "YML Files"]
             writer.writerow(headers)
@@ -203,7 +203,7 @@ class Mining:
         output_csv_path = os.path.join(dataset_dir, output_csv)
 
         with open(output_csv_path, mode='w', newline='', encoding='utf-8') as csvfile:
-            writer = csv.writer(csvfile)
+            writer = csv.writer(csvfile, delimiter=';')
             writer.writerow(headers)
 
             logging.info("Creating Dataset...")

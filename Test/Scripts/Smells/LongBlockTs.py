@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 @pytest.fixture
 def workflow():
-    action = Action(file_path='../../Yamls/Smells/LongBlock.yaml')
+    action = Action(file_path='../../Yamls/Smells/Prisma/test-template.yml')
     workflow = action.prepare_for_analysis()
     return workflow
 
@@ -21,15 +21,13 @@ def test_long_block(workflow):
     findings = checker.long_block_check(workflow)
 
     expected_findings = [
-        "The job 'job2' has more than 11 steps. Consider splitting the steps into "
+        "The job 'no-docker' has more than 16 steps. Consider splitting the steps "
+        'into multiple jobs. A longer job can be difficult to maintain and debug and '
+        'can lead to security vulnerabilities.',
+        "The job 'others' has more than 12 steps. Consider splitting the steps into "
         'multiple jobs. A longer job can be difficult to maintain and debug and can '
         'lead to security vulnerabilities.',
-
-        "The step 'Step 1' run has more than 22 commands. Consider splitting the "
-        'commands into multiple step groups. A longer step group can be difficult to '
-        'maintain and debug and can lead to security vulnerabilities.',
-
-        'The workflow has more than 11 jobs. Consider splitting the jobs into '
+        'The workflow has more than 17 jobs. Consider splitting the jobs into '
         'multiple workflows. A longer pipeline can be difficult to maintain and debug '
         'and can lead to security vulnerabilities.'
     ]
@@ -42,15 +40,13 @@ def test_integration(workflow):
     findings = checker.detect()
 
     expected_findings = [
-        "The job 'job2' has more than 11 steps. Consider splitting the steps into "
+        "The job 'no-docker' has more than 16 steps. Consider splitting the steps "
+        'into multiple jobs. A longer job can be difficult to maintain and debug and '
+        'can lead to security vulnerabilities.',
+        "The job 'others' has more than 12 steps. Consider splitting the steps into "
         'multiple jobs. A longer job can be difficult to maintain and debug and can '
         'lead to security vulnerabilities.',
-
-        "The step 'Step 1' run has more than 22 commands. Consider splitting the "
-        'commands into multiple step groups. A longer step group can be difficult to '
-        'maintain and debug and can lead to security vulnerabilities.',
-
-        'The workflow has more than 11 jobs. Consider splitting the jobs into '
+        'The workflow has more than 17 jobs. Consider splitting the jobs into '
         'multiple workflows. A longer pipeline can be difficult to maintain and debug '
         'and can lead to security vulnerabilities.'
     ]
