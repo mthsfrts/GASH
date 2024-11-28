@@ -734,14 +734,3 @@ class Mining:
                         logging.error(f"Failed to download log for run {run_id}: {e}")
 
             logging.info(f"Logs dataset saved at {logs_csv_path}")
-
-# if __name__ == '__main__':
-#     _file = '../../Generated/DataSets/teste.csv'
-#     _jobs = '../../Generated/prisma/DataSets/runs.csv'
-#     _id = 0
-#     _owner = 1
-#     _repo = 2
-#
-#     token = "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"
-#     mining = Mining(token)
-#     mining.logs(_jobs, _repo, _owner, _id)
