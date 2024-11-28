@@ -86,7 +86,8 @@ class Action:
         job.name = job_name
         job._id = job_data.get('id', None)
         job.runs_on = job_data.get('runs-on', None)
-        job.steps = [self.populate_step(step_data) for step_data in job_data.get('steps', [])]
+        job.steps = [self.populate_step(step_data) for step_data in job_data.get('steps', [])
+                     if isinstance(step_data, (dict, str))]
         job.env = job_data.get('env', {})
         job._if = job_data.get('if', None)
         job.concurrency = job_data.get('concurrency', None)
@@ -111,15 +112,39 @@ class Action:
         Populates and returns a Step object.
         """
         step = Steps.Step()
-        step.name = step_data.get('name', None)
-        step._id = step_data.get('id', None)
-        step.uses = step_data.get('uses', None)
-        step.run = step_data.get('run', None)
-        step.working_directory = step_data.get('working-directory', None)
-        step.env = step_data.get('env', {})
-        step._if = step_data.get('if', None)
-        step.continue_on_error = step_data.get('continue-on-error', None)
-        step.timeout_minutes = step_data.get('timeout-minutes', None)
-        step.uses = step_data.get('uses', None)
-        step.with_params = step_data.get('with', {})
+        if isinstance(step_data, dict):
+            step.name = step_data.get('name', None)
+            step._id = step_data.get('id', None)
+            step.uses = step_data.get('uses', None)
+            step.run = step_data.get('run', None)
+            step.working_directory = step_data.get('working-directory', None)
+            step.env = step_data.get('env', {})
+            step._if = step_data.get('if', None)
+            step.continue_on_error = step_data.get('continue-on-error', None)
+            step.timeout_minutes = step_data.get('timeout-minutes', None)
+            step.with_params = step_data.get('with', {})
+
+        elif isinstance(step_data, str):
+            step.run = step_data
+        else:
+            step = None
+
         return step
+
+    # def populate_step(step_data):
+    #     """
+    #     Populates and returns a Step object.
+    #     """
+    #     step = Steps.Step()
+    #     step.name = step_data.get('name', None)
+    #     step._id = step_data.get('id', None)
+    #     step.uses = step_data.get('uses', None)
+    #     step.run = step_data.get('run', None)
+    #     step.working_directory = step_data.get('working-directory', None)
+    #     step.env = step_data.get('env', {})
+    #     step._if = step_data.get('if', None)
+    #     step.continue_on_error = step_data.get('continue-on-error', None)
+    #     step.timeout_minutes = step_data.get('timeout-minutes', None)
+    #     step.uses = step_data.get('uses', None)
+    #     step.with_params = step_data.get('with', {})
+    #     return step
