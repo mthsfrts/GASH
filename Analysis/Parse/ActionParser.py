@@ -130,21 +130,3 @@ class Action:
             step = None
 
         return step
-
-    # def populate_step(step_data):
-    #     """
-    #     Populates and returns a Step object.
-    #     """
-    #     step = Steps.Step()
-    #     step.name = step_data.get('name', None)
-    #     step._id = step_data.get('id', None)
-    #     step.uses = step_data.get('uses', None)
-    #     step.run = step_data.get('run', None)
-    #     step.working_directory = step_data.get('working-directory', None)
-    #     step.env = step_data.get('env', {})
-    #     step._if = step_data.get('if', None)
-    #     step.continue_on_error = step_data.get('continue-on-error', None)
-    #     step.timeout_minutes = step_data.get('timeout-minutes', None)
-    #     step.uses = step_data.get('uses', None)
-    #     step.with_params = step_data.get('with', {})
-    #     return step

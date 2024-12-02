@@ -231,7 +231,7 @@ class GitHubAPI:
             url_bs = f"https://github.com/marketplace/actions/{action_name}"
             response_bs = requests.get(url_bs)
             if response_bs.status_code == 404:
-                logging.warning(f"GitHub Action marketplace page not found for action: {action_name}")
+                # logging.warning(f"GitHub Action marketplace page not found for action: {action_name}")
                 verification_badge = False
             else:
                 response_bs.raise_for_status()
@@ -248,17 +248,26 @@ class GitHubAPI:
         """Fetch the vulnerabilities of a repository."""
 
         url = f'https://api.github.com/repos/{owner}/{name}/security-advisories'
-        response = requests.get(url, headers=self.headers, timeout=10)
-        response.raise_for_status()
+        try:
+            response = requests.get(url, headers=self.headers, timeout=10)
+            response.raise_for_status()
 
-        if response.status_code == 200:
-            vulnerabilities = response.json()
-            if vulnerabilities:
-                return json.dumps(vulnerabilities, indent=4)
-            else:
+            if response.status_code == 200:
+                vulnerabilities = response.json()
+                if vulnerabilities:
+                    return json.dumps(vulnerabilities, indent=4)
+                else:
+                    return None
+
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 404:
                 return None
-        else:
-            logging.error(f"Error fetching vulnerabilities: {response.text}")
+            else:
+                logging.error(f"Error fetching vulnerabilities for {owner}/{name}: {e}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error connecting to GitHub API for {owner}/{name}: {e}")
             return None
 
     def get_workflow_ids(self, owner, name):
