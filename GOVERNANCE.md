@@ -1,211 +1,170 @@
 # Governança do Projeto GASH
 
-O GASH é um projeto open source com forte caráter educacional. Ele é desenvolvido no contexto da disciplina do professor @lincolnrocha, com participação de alunos, monitores e, futuramente, contribuidores externos.
+O GASH é um projeto open source com foco em **educação e colaboração**, desenvolvido inicialmente em um ambiente acadêmico, mas estruturado para receber contribuições contínuas da comunidade externa.
 
 Este documento explica como o projeto é organizado, quem faz o quê, como as decisões são tomadas e de que forma a comunicação deve acontecer para que o trabalho seja colaborativo e transparente.
 
 ---
 
-## 1. Contexto e objetivos
+## 1. Contexto e Objetivos
 
-A governança do GASH tem alguns objetivos centrais:
+A governança do GASH visa garantir a saúde e a longevidade do projeto, com os seguintes objetivos centrais:
 
-- apoiar o uso do projeto como ferramenta de aprendizado;
-- deixar claras as responsabilidades de cada papel;
-- facilitar a entrada de novos contribuidores (alunos e externos);
-- registrar as decisões de forma que qualquer pessoa consiga entender o histórico.
+* **Promover o aprendizado e a Mentoria** contínuos para novos e atuais contribuidores.
+* **Deixar claras as responsabilidades** de cada papel, desde Contribuidores até *Maintainers*.
+* **Facilitar a entrada de novos membros** da comunidade open-source.
+* **Assegurar que as decisões sejam registradas** de forma clara e acessível a qualquer pessoa (*transparência histórica*).
 
-Este documento é um ponto de partida. Ele pode e deve ser ajustado conforme o projeto, a disciplina e a comunidade evoluirem.
-
----
-
-## 2. Modelo de governança
-
-O GASH adota um modelo inspirado em BDFL (Benevolent Dictator For Life), adaptado ao contexto da disciplina.
-
-- O professor @lincolnrocha atua como BDFL:
-  - define visão e prioridades gerais do projeto
-  - decide casos de impasse em decisões importantes
-  - é responsável, junto com os monitores, pelos merges em produção
-
-- Os monitores atuam como co-maintainers:
-  - ajudam a filtrar issues e PRs
-  - revisam e aprovam PRs
-  - orientam as squads e fazem a ponte entre professor e alunos
-
-A ideia é sempre buscar consenso. A prerrogativa de decisão final do professor existe para evitar paralisação quando não houver acordo ou quando for preciso decidir em prazos curtos.
+Este documento é um ponto de partida. Ele pode e deve ser ajustado conforme o projeto e a comunidade evoluírem.
 
 ---
 
-## 3. Papéis no projeto
+## 2. Modelo de Governança
 
-### Professor (BDFL)
+O GASH adota um modelo **BDFL Adaptado** (*Benevolent Dictator For Life*), onde a figura central atua como um líder visionário, mas prioriza o consenso da comunidade.
 
-- Define a direção geral do projeto.
-- Dá a palavra final em decisões de maior impacto.
-- Chancela merges em produção (`prod`) e marcos importantes.
+* **Project Lead (BDFL):** [@lincolnrocha]
+    * Define a visão de longo prazo e as prioridades estratégicas do projeto.
+    * Decide em casos de **impasse** em decisões de arquitetura ou direção.
+    * É responsável, junto com os *Maintainers*, pela aprovação final de *merges* na *branch* estável (`prod` / `main`).
 
-### Monitores (co-maintainers)
+* **Core Maintainers (Co-Maintainers):**
+    * Ajudam a filtrar *issues* e *Pull Requests* (PRs).
+    * Revisam tecnicamente e aprovam PRs.
+    * Atuam como **Mentores Técnicos** para os *Feature Teams* (Squads).
 
-- Acompanham issues e PRs.
-- Revisam e aprovam PRs para a branch de desenvolvimento (dev).
-- Orientam squads, esclarecem dúvidas de processo e boas práticas.
-- Atuam como mediadores quando há opiniões técnicas divergentes.
-
-### Squads
-
-O trabalho é organizado em squads fixas. Cada squad cuida de um conjunto de issues durante o período da disciplina.
-
-Dentro de cada squad, existem alguns papéis principais (que podem ser acumulados, dependendo do tamanho da equipe):
-
-- Líder de squad:
-  Coordena o trabalho da squad, quebra issues maiores em sub-issues, ajuda a distribuir tarefas, organiza a branch da squad e faz a ponte com monitores e professor.
-
-- Desenvolvedores:
-  Implementam as tarefas de código acordadas pela squad, seguindo os padrões do projeto.
-
-- Revisor de PR:
-  Faz a primeira revisão dos PRs da squad, verifica se o código faz o que promete, se não quebra nada e se está de acordo com a issue.
-
-- Documentador:
-  Mantém a documentação atualizada (arquivos `.md`, diagramas, notas de release, documentação de API).
-
-- QA / Testes:
-  Cria e mantém testes, pensa em cenários de uso, ajuda a garantir qualidade e segurança do código.
-
-Os nomes dos papéis importam menos do que a ideia central: cada pessoa sabe de que parte é responsável e o que se espera dela em cada entrega.
-
-### Contribuidores externos
-
-Contribuidores que não fazem parte da disciplina são bem-vindos. Eles:
-
-- abrem issues ou comentam em issues existentes para discutir propostas
-- seguem o mesmo fluxo de PRs
-- são acompanhados por monitores e, quando fizer sentido, podem colaborar com squads ou módulos específicos
+A filosofia é sempre buscar o **consenso** e a **colaboração**. A prerrogativa de decisão final do *Project Lead* existe para garantir que o projeto não se paralise em situações de desacordo técnico ou prazos curtos.
 
 ---
 
-## 4. Branches e fluxo de contribuição
+## 3. Papéis no Projeto
 
-O fluxo de branches pode ser ajustado com o tempo, mas a ideia geral é:
+Os nomes dos papéis descrevem as responsabilidades e importam mais do que o *status* acadêmico do indivíduo.
 
-- prod: branch estável, usada para releases e versões em produção
-- dev: branch de integração, onde o código aprovado é consolidado antes de ir para prod
-- branches de feature, geralmente criadas a partir de dev, por exemplo:  
-  feature/squad-nn-descricao-curta
+### Project Lead (BDFL)
 
-Fluxo típico de trabalho para uma issue:
+* Define a direção geral, visão de produto e prioridades estratégicas.
+* Dá a palavra final em decisões de maior impacto na arquitetura.
+* Chancela *merges* em produção (`prod`/`main`) e grandes *releases*.
 
-1. A issue principal é atribuída a uma squad.
-2. O líder da squad, com o time, quebra a issue em sub-issues se necessário e define quem faz o que.
-3. A squad cria uma branch de trabalho a partir de dev.
-4. O desenvolvimento acontece nessa branch, com commits pequenos e descritivos.
-5. Ao finalizar, a squad abre um PR da branch de feature para dev.
-6. O PR é revisado primeiro dentro da squad (revisor da squad) e depois por pelo menos um monitor.
-7. Uma vez aprovado pelo monitor, o PR é mesclado em dev.
-8. Em momentos definidos, o professor e os monitores organizam merges de dev para prod.
+### Core Maintainers (Mentores Técnicos / Revisores Chave)
 
-Inicialmente, merges nas branches principais (dev e prod) são feitos apenas por monitores e pelo professor.  
-Alunos podem revisar PRs e são incentivados a fazer isso, mas não realizam merges nessas branches no começo do projeto.
+* Acompanham o *backlog* de *issues* e PRs do projeto como um todo.
+* **Revisam e aprovam PRs** para a *branch* de integração (`dev`).
+* **Orientam** os *Feature Teams* (Squads) em dúvidas de processo, arquitetura e boas práticas.
+* Atuam como **mediadores** em divergências técnicas de alto nível.
 
----
+### Contribuidores (Organizados em Feature Teams / Squads)
 
-## 5. Processo de decisão
+O trabalho de desenvolvimento é organizado em *Feature Teams* (Squads). Cada *Team* é responsável por um conjunto de funcionalidades ou módulos.
 
-### Decisões do dia a dia
+* **Team Lead (Líder Técnico):**
+    * Coordena o trabalho da *Team*.
+    * Faz a quebra técnica de *issues* maiores e distribui tarefas.
+    * Garante a organização da *branch* do *Team* e faz a ponte com os *Core Maintainers*.
+* **Desenvolvedores (Contributors):**
+    * Implementam as tarefas de código, aderindo aos padrões de projeto.
+* **Technical Reviewer (Revisor de PR do Team):**
+    * Faz a primeira revisão técnica de código dentro do *Team*, focando em funcionalidade, testes e padrões.
+* **Documentador:**
+    * Cria e mantém a documentação (arquivos `.md`, diagramas, documentação de API).
+* **QA / Testes:**
+    * Cria e mantém suítes de testes, garante a qualidade e segurança do código.
 
-Decisões de menor impacto (detalhes de implementação, divisão de tarefas, pequenas mudanças de escopo) são tomadas:
+### Contribuidores Externos (Community Contributors)
 
-- dentro da própria squad, em diálogo entre líder, devs, revisor, documentador e QA
-- com apoio dos monitores, quando houver dúvida
+Contribuidores que não fazem parte do *Feature Team* inicial são bem-vindos. Eles:
 
-Essas decisões devem ser registradas em comentários de issue ou PR, para que tenhamos histórico.
-
-### Decisões com divergência
-
-Quando houver opiniões técnicas distintas e a discussão ficar travada, o caminho esperado é:
-
-1. A discussão acontece na issue ou no PR, de forma respeitosa, com argumentos técnicos
-2. Se não houver convergência, um monitor assume o papel de mediador
-3. O monitor ajuda a buscar um meio-termo ou uma solução que seja aceitável para quem está envolvido
-4. Se mesmo assim não houver acordo, o professor decide, ouvindo os monitores
-
-### Decisões de maior impacto
-
-Mudanças que afetam o projeto como um todo (arquitetura, ferramentas centrais, mudanças de processo que atingem todas as squads, alteração deste próprio documento) devem:
-
-- ter uma issue própria, com contexto e proposta clara
-- ficar abertas por um tempo razoável para comentários (dentro das limitações do calendário da disciplina)
-- ser decididas pelo professor, com apoio dos monitores, quando não houver consenso
+* Abem *issues* ou propõem soluções em *issues* existentes.
+* Seguem o mesmo fluxo de PRs.
+* São acompanhados e *mentorados* pelos **Core Maintainers**.
 
 ---
 
-## 6. Evolução de responsabilidades e acesso
+## 4. Branches e Fluxo de Contribuição
 
-A evolução de responsabilidades no GASH não é baseada apenas em quantidade de commits. O que mais conta é a combinação de:
+O fluxo de *branches* segue o padrão de integração comum:
 
-- consistência das contribuições (código, testes, documentação)
-- qualidade técnica
-- postura colaborativa e respeito ao fluxo definido
-- disposição em ajudar outras pessoas e assumir responsabilidade por partes do projeto
+* `prod` / `main`: *Branch* estável, usada para *releases* em produção.
+* `dev`: *Branch* de integração, onde o código aprovado é consolidado.
+* *Branches* de *feature*: Criadas a partir de `dev`, ex.: `feature/team-nn-descricao-curta`.
 
-Um caminho típico de evolução pode ser:
+**Fluxo Típico de PR:**
 
-1. A pessoa começa contribuindo com pequenas tarefas, seguindo o fluxo de issues e PRs
-2. Com o tempo, passa a revisar PRs dentro da squad, com acompanhamento de um monitor
-3. Depois de mostrar consistência e maturidade técnica, pode se tornar líder de squad ou referência em uma área do código
-4. Em alguns casos, pode receber permissões adicionais (por exemplo, para abrir e organizar issues, ou para ajudar em merges sob supervisão)
-
-Convites para assumir papéis com mais responsabilidade devem ser feitos de forma transparente, de preferência registrados em issue ou PR, para que todos entendam os critérios.
-
----
-
-## 7. Comunicação e registro de decisões
-
-A governança definida aqui depende muito de uma boa organização da comunicação.
-
-### Comunicação assíncrona
-
-A base da comunicação do projeto são:
-
-- issues (para bugs, features, dúvidas e propostas)
-- pull requests (para discutir e revisar mudanças de código)
-
-Toda decisão importante deve estar registrada em algum desses lugares.  
-Isso evita que informações fiquem perdidas em conversas privadas ou em canais de chat e permite que qualquer pessoa que chegue depois entenda o histórico.
-
-### Comunicação síncrona
-
-Devem existir canais síncronos (por exemplo, um canal específico no Discord) para conversas mais rápidas. A função principal desses canais é destravar discussões que ficaram paradas, fazer alinhamentos pontuais e tirar dúvidas urgentes.
-
-Mesmo quando a conversa acontecer de forma síncrona, vale a seguinte regra:
-
-- o resumo do que foi decidido deve voltar para a issue ou PR correspondente
-
-### Fluxo de comunicação entre papéis
-
-De forma geral:
-
-- o professor define orientação geral, prioridades maiores e valida decisões importantes
-- monitores traduzem essas orientações para o dia a dia das squads, acompanham o que está acontecendo e ajudam a resolver problemas
-- líderes de squad organizam o trabalho dentro de cada grupo e garantem que as informações circulem
-- devs, revisores, documentadores e QA implementam e registram o trabalho
-
-Esse fluxo não é uma hierarquia rígida. Alunos podem e devem trazer sugestões e questionamentos “de baixo para cima”, principalmente via issues.  
-O importante é que as informações circulem e fiquem registradas de maneira clara.
+1.  A *Feature* ou *Bugfix* é atribuída a um *Team*.
+2.  O *Team* cria uma *branch* de trabalho a partir de `dev`.
+3.  O desenvolvimento ocorre, com *commits* pequenos e descritivos.
+4.  Ao finalizar, o *Team* abre um PR da *branch* de *feature* para `dev`.
+5.  O PR é revisado pelo *Technical Reviewer* do *Team* e, em seguida, por pelo menos um **Core Maintainer**.
+6.  Após a aprovação do **Core Maintainer**, o PR é *mergeado* em `dev`.
+7.  *Merges* de `dev` para `prod` / `main` são feitos apenas pelos **Project Lead** e **Core Maintainers** em momentos de *release*.
 
 ---
 
-## 8. Revisão deste documento
+## 5. Processo de Decisão
 
-O GOVERNANCE.md é um documento vivo.
+A prioridade é o registro transparente das decisões.
 
-Ele deve ser revisado:
+### Decisões de Menor Impacto
 
-- para refletir o que funcionou e o que precisa ser ajustado, ou
-- sempre que houver mudança relevante na forma como o projeto é organizado.
+Decisões do dia a dia (detalhes de implementação, divisão de tarefas, escopo de *sub-issues*) são tomadas:
 
-Propostas de alteração devem ser feitas via PR que modifica este arquivo, associada a uma issue explicando o motivo da mudança.
+* Dentro do próprio **Feature Team**, com o aval do *Team Lead*.
+* Com apoio dos **Core Maintainers**, em caso de dúvidas processuais.
 
-A governança do GASH é um compromisso coletivo. Ela só faz sentido se for conhecida, aplicada e, quando necessário, revisada pela própria comunidade do projeto.
+Essas decisões devem ser registradas em comentários da *issue* ou PR correspondente.
 
+### Decisões com Divergência Técnica
+
+Quando há divergência técnica e a discussão se arrasta:
+
+1.  A discussão deve ocorrer de forma **respeitosa e técnica** na *issue* ou PR.
+2.  Se não houver convergência, um **Core Maintainer** assume a mediação, buscando um consenso.
+3.  Se a divergência persistir, o **Project Lead** decide, após ouvir os **Core Maintainers**.
+
+### Decisões de Maior Impacto (Arquitetura e Processo)
+
+Mudanças que afetam o projeto como um todo (arquitetura central, mudança de ferramentas, alteração deste *GOVERNANCE.md*) devem:
+
+* Ter uma *issue* própria (*Proposal Issue*), com contexto e proposta clara.
+* Ficar abertas à discussão por um tempo razoável.
+* Ser decididas pelo **Project Lead**, com o apoio dos **Core Maintainers**, quando não houver consenso na comunidade.
+
+---
+
+## 6. Evolução de Responsabilidades e Acesso
+
+A ascensão de responsabilidade no GASH é baseada na **consistência** e na **qualidade da contribuição**, não apenas na quantidade de *commits*. Os critérios são:
+
+* Consistência das contribuições (código, testes, documentação).
+* Qualidade técnica e adesão a padrões.
+* **Postura colaborativa, proatividade** e **Mentoria** a outros membros.
+* Disposição em assumir responsabilidade por módulos ou áreas do projeto.
+
+**Caminho de Evolução Típico:**
+
+1.  Começa como **Contributor** em um *Feature Team*.
+2.  Evolui para **Technical Reviewer** dentro do *Team*.
+3.  Torna-se **Team Lead** ou **Referência Técnica** em um módulo.
+4.  Em casos de excelência e comprometimento de longo prazo, pode ser convidado a se tornar um **Core Maintainer**.
+
+Convites para papéis com mais responsabilidade devem ser transparentes e registrados.
+
+---
+
+## 7. Comunicação e Registro de Decisões
+
+A comunicação eficaz é fundamental para a governança.
+
+* **Comunicação Assíncrona (Base):** **Issues** (para bugs, *features* e propostas) e **Pull Requests** (para revisão de código) são os canais primários.
+    * **Toda decisão importante deve ser registrada** nesses canais para criar um histórico acessível.
+* **Comunicação Síncrona (Apoio):** Canais de *chat* (ex.: Discord) são usados para alinhamentos rápidos, desimpedir discussões travadas ou dúvidas urgentes.
+    * **Regra de Ouro:** O resumo do que foi decidido em canais síncronos **deve ser postado de volta** na *issue* ou PR correspondente.
+
+---
+
+## 8. Revisão deste Documento
+
+O `GOVERNANCE.md` é um **documento vivo**.
+
+Propostas de alteração devem ser feitas via PR que modifique este arquivo, associada a uma *Proposal Issue* explicando a motivação da mudança.
