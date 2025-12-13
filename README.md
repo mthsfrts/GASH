@@ -1,3 +1,66 @@
+# GASH
+
+**GASH** (GitHub Actions Smells Hunter) is a static analysis tool for **GitHub Actions workflows** focused on detecting **security vulnerabilities**, **misconfigurations**, and **maintainability smells** in CI/CD pipelines.
+
+The tool helps developers and DevOps teams identify risky patterns early in the development lifecycle, improving **pipeline security**, **reliability**, and **code quality** before workflows reach production.
+
+---
+
+## Why GASH?
+
+GitHub Actions workflows often grow organically and, over time, may accumulate insecure practices, duplicated logic, overly permissive permissions, or fragile configurations that are hard to maintain and audit.
+
+GASH addresses this problem by:
+- systematically analyzing workflow definitions,
+- identifying known **smells and anti-patterns**,
+- and categorizing them by **severity**, **impact**, and **mitigation strategy**.
+
+---
+
+## Who is GASH for?
+
+GASH is useful for:
+- **Developers** who want safer and cleaner CI/CD pipelines,
+- **DevOps and Platform Engineers** responsible for pipeline governance,
+- **Security teams** auditing GitHub Actions workflows,
+- **Researchers and students** studying CI/CD quality and security patterns.
+
+---
+
+## What does GASH analyze?
+
+GASH inspects GitHub Actions workflows to detect issues related to:
+
+-  **Security**
+  - Hard-coded secrets
+  - Unsecure protocols
+  - Untrusted dependencies
+  - Overly permissive permissions
+  - Unsafe remote triggers
+
+-  **Maintenance & Reliability**
+  - Duplicated or replicated code
+  - Misconfigurations
+  - Lack of proper error handling
+
+-  **Code Quality**
+  - Long and hard-to-maintain code blocks
+
+Each detected smell includes a description, severity level, justification, and mitigation guidance.
+
+---
+
+## How to read this documentation
+
+This README is structured as follows:
+1. **Conceptual and reference information** about GitHub Actions syntax and configuration.
+2. A **catalog of smells and anti-patterns** detected by GASH, including categories and mitigation strategies.
+
+If you are new to GitHub Actions or CI/CD analysis, start with the conceptual sections.  
+If you are looking for specific smells or detection rules, jump directly to the relevant sections below.
+
+---
+
 # GitHub Actions Syntax
 
 ## GitHub Actions Configuration Structure
