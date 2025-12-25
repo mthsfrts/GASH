@@ -7,6 +7,7 @@
 **GASH** (GitHub Actions Smells Hunter) is a static analysis tool for **GitHub Actions workflows** focused on detecting **security vulnerabilities**, **misconfigurations**, and **maintainability smells** in CI/CD pipelines.
 
 The tool helps developers and DevOps teams identify risky patterns early in the development lifecycle, improving **pipeline security**, **reliability**, and **code quality** before workflows reach production.
+> GASH is both a static analysis tool **and** a curated knowledge base of GitHub Actions smells and anti-patterns.
 
 ---
 
@@ -65,6 +66,42 @@ If you are looking for specific smells or detection rules, jump directly to the 
 
 ---
 
+## Getting Started
+
+This section explains how to use GASH from scratch.
+
+### Prerequisites
+
+- Python 3.10+
+- A local repository containing GitHub Actions workflows (`.github/workflows/*.yml`)
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/mthsfrts/GASH.git
+cd GASH
+```
+
+### Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### Running GASH
+Run GASH by specifying the analyze subcommand and the path to a workflow file:
+```bash
+python GASH.py analyze --file my-repo/.github/workflows/ci.yml
+```
+Analyze all workflow files in a directory
+```bash
+python GASH.py batch-analyze --dir my-repo/.github/workflows/
+```
+GASH performs a static analysis of the workflows and reports detected
+smells, including their severity, justification, and mitigation guidance.
+
+---
 # GitHub Actions Syntax
 
 ## GitHub Actions Configuration Structure
