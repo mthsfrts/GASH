@@ -1,3 +1,7 @@
-*
 venv/
 Test/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo   
