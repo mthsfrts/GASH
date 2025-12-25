@@ -1,4 +1,8 @@
-# GASH
+<p align="center">
+  <img src="assets/banner.png" alt="GA//SH banner" style="max-width:100%; height:auto;">
+</p>
+
+# GitHub Actions Smells Hunter
 
 **GASH** (GitHub Actions Smells Hunter) is a static analysis tool for **GitHub Actions workflows** focused on detecting **security vulnerabilities**, **misconfigurations**, and **maintainability smells** in CI/CD pipelines.
 
