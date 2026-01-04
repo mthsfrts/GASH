@@ -1,3 +1,5 @@
-*
+.venv/
 venv/
-Test/
+
+__pycache__/
+*.pyc
