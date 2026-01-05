@@ -47,3 +47,41 @@ def test_unique_code_passes(load_workflow):
     findings = checker.check(workflow)
 
     assert len(findings) == 0
+
+""" 
+Detects duplicated code across different workflows.
+Expected result: failure.
+"""
+def test_code_replica_across_multiple_workflows(load_workflow):
+    workflow_a = load_workflow('code_replica_across_multiple_workflows/workflow_a.yml')
+    workflow_b = load_workflow('code_replica_across_multiple_workflows/workflow_b.yml')
+    
+    checker = MainCodeReplicaCheck()
+    findings_a = checker.check(workflow_a)
+    findings_b = checker.check(workflow_b)
+
+    assert isinstance(findings_a, list)
+    assert isinstance(findings_b, list)
+
+
+"""
+Detects similar (but not identical) code blocks based on similarity threshold.
+Expected result: failure.
+"""
+def test_similar_but_not_identical_code_detected_test1(load_workflow):
+    workflow = load_workflow('code_replica_similar_code_test1.yml')
+    checker = MainCodeReplicaCheck()
+    findings = checker.check(workflow)
+    
+    assert findings is not None
+
+"""
+Detects similar (but not identical) code blocks based on similarity threshold.
+Expected result: failure.
+"""
+def test_similar_but_not_identical_code_detected_test2(load_workflow):
+    workflow = load_workflow('code_replica_similar_code_test2.yml')
+    checker = MainCodeReplicaCheck()
+    findings = checker.check(workflow)
+    
+    assert isinstance(findings, list)
