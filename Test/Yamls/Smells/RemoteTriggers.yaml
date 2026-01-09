@@ -79,6 +79,9 @@ on:
         description: Sixteenth input.
         type: string
         required: false
+      call_input_17: # Choice without options.
+        description: Seventeenth input.
+        type: choice
 
   workflow_run:
     description: This is a run trigger.

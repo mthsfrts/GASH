@@ -2,12 +2,19 @@ from Analysis.Smells.Categories.Security.RemoteTriggers.RemoteTriggersSt import 
 from Analysis.Smells.Categories.Security.RemoteTriggers.RemoteTriggersFct import RemoteRunFct
 from Analysis.Parse.ActionParser import Action
 import pytest
+from pathlib import Path
 
 
 @pytest.fixture
 def workflow():
-    action = Action(file_path='../../Yamls/Smells/RemoteTriggers.yaml')
+    base_dir = Path(__file__).resolve().parent
+    yaml_path = base_dir / "../../Yamls/Smells/RemoteTriggers.yaml"
+    yaml_path = yaml_path.resolve()
+
+    action = Action(file_path=str(yaml_path))
     workflow = action.prepare_for_analysis()
+
+    assert workflow is not None
     return workflow
 
 
@@ -27,24 +34,24 @@ def test_remote_call(workflow):
 
     expected_findings = [
         "Input 'call_input_03' has an invalid type 'invalid_type'.",
-        "Input 'call_input_03' lacks a description. Consider add a description for a "
-        'better understanding and maintenance.',
+        "Input 'call_input_03' lacks a description. Consider adding a "
+        "description for better understanding and maintenance.",
         "Input 'call_input_04' is required but has no default value.",
         "Input 'call_input_08' is required but has no default value.",
         "Input 'call_input_11' is required but has no default value.",
-        "Input 'call_input_13' of type 'boolean' should not be required. Consider "
-        'remove the parameter.',
+        "Input 'call_input_13' of type 'boolean' should not be required. "
+        "Consider removing the parameter.",
         "Input 'call_input_16' is required but has no default value.",
-        'The trigger has too many inputs. Consider revisit your original Action to '
-        'see the need for all of the inputs. The inputs overflow, might cause '
+        "Input 'call_input_17' of type 'choice' lacks an 'options' definition.",
+        'The trigger has too many inputs. Consider revisiting your original Action '
+        'to see the need for all of the inputs. An overflow of inputs might cause '
         'security and maintenance issues.',
         'Workflow call trigger is set with a higher permission on a workflow level. '
-        'Consider the add best security protocol for it. This trigger might harm your '
-        'pipeline if it is not configure correctly.',
-        'You should be careful when reference secrets in workflow call. Consider use '
-        'Secrets Env to do so. Ex: ${{ secrets.SECRET_NAME }}.'
+        'Consider the add best security protocol for it. This trigger might harm '
+        'your pipeline if it is not configured correctly.',
+        'You should be careful when referencing secrets in workflow call. '
+        'Consider using Secrets Env to do so. Ex: ${{ secrets.SECRET_NAME }}.'
     ]
-
     assert sorted(findings) == sorted(expected_findings)
 
 
