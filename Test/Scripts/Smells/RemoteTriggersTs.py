@@ -43,6 +43,10 @@ def test_remote_call(workflow):
         "Consider removing the parameter.",
         "Input 'call_input_16' is required but has no default value.",
         "Input 'call_input_17' of type 'choice' lacks an 'options' definition.",
+        "Input 'call_input_18' lacks a description. Consider adding a description "
+        "for better understanding and maintenance.",
+        "Input 'call_input_19' has an invalid type 'None'.",
+        "Input 'call_input_20' has an invalid type 'array'.",
         'The trigger has too many inputs. Consider revisiting your original Action '
         'to see the need for all of the inputs. An overflow of inputs might cause '
         'security and maintenance issues.',
@@ -85,6 +89,10 @@ def test_remote_integration(workflow):
         "Consider removing the parameter.",
         "Input 'call_input_16' is required but has no default value.",
         "Input 'call_input_17' of type 'choice' lacks an 'options' definition.",
+        "Input 'call_input_18' lacks a description. "
+        "Consider adding a description for better understanding and maintenance.",
+        "Input 'call_input_19' has an invalid type 'None'.",
+        "Input 'call_input_20' has an invalid type 'array'.",
         'Invalid configuration for workflow_dispatch: expected a dictionary, '
         'but got NoneType. Ensure the workflow_dispatch configuration is properly defined.',
         'The trigger has too many inputs. Consider revisiting your original Action to see '
