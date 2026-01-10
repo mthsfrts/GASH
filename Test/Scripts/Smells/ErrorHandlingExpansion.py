@@ -6,8 +6,6 @@ from Analysis.Smells.Categories.Maintenance.ErrorHandling.ErrorHandlingSt import
 def load_data(filename):
     base_path = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(base_path, '..', '..', 'Fixtures', 'ErrorHandling', filename)
-    # Se o ActionParser estiver falhando porque o arquivo não é um workflow completo,
-    # você pode carregar o YAML puro aqui, mas vamos tentar via ActionParser primeiro:
     action = Action(file_path=file_path)
     return action.prepare_for_analysis()
 
@@ -34,3 +32,13 @@ def test_expansion_retry_logic(checker):
     data = load_data('no_retry_logic.yml')
     findings = checker.check(data)
     assert isinstance(findings, list)
+    
+def test_expansion_fail_fast(checker):
+    data = load_data('timeout_checks.yml')
+    findings = checker.check_fail_fast(data)
+    assert len(findings) > 0
+
+def test_expansion_job_timeouts(checker):
+    data = load_data('timeout_checks.yml')
+    findings = checker.check_timeouts(data)
+    assert len(findings) > 0

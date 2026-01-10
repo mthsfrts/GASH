@@ -1,0 +1,21 @@
+name: Timeout Checks
+on: push
+
+jobs:
+  job1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    strategy:
+      fail-fast: true
+    steps:
+      - name: step1
+        run: exit 1
+        timeout-minutes: 1
+
+  job2:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: step2
+        run: sleep 1
+        timeout-minutes: 20
