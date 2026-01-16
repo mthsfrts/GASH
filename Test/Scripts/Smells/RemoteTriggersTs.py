@@ -111,3 +111,18 @@ def test_remote_integration(workflow):
         'Consider using Secrets Env to do so. Ex: ${{ secrets.SECRET_NAME }}.'
     ]
     assert sorted(findings) == sorted(expected_findings)
+
+
+def test_repository_dispatch_without_payload():
+    base_dir = Path(__file__).resolve().parent
+    yaml_path = base_dir / "../../Yamls/Smells/RemoteTriggers_repo_dispatch.yaml"
+    yaml_path = yaml_path.resolve()
+
+    action = Action(file_path=str(yaml_path))
+    workflow = action.prepare_for_analysis()
+
+    checker = MainRemoteRunCheck()
+    findings = checker.check_dispatch(workflow)
+
+    # Espera-se pelo menos 1 finding
+    assert len(findings) > 0
