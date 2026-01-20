@@ -158,24 +158,81 @@ class MainMisconfigurationCheck:
             return re.match(r"\$\{\{.*\}\}", expression.strip()) is not None
 
         if concurrency:
-            if 'group' not in concurrency or not isinstance(concurrency['group'], str):
-                self.findings.append(
-                    f"Concurrency configuration is missing the 'group' parameter or it is not a string: "
-                    f"{concurrency.get('group')}. "
-                    f"Ensure 'group' is specified and is a string.")
-
-            if 'cancel-in-progress' not in concurrency:
-                self.findings.append(
-                    f"Concurrency configuration is missing the cancel-in-progress. "
-                    f"Ensure 'cancel-in-progress' is specified and is a boolean.")
-
-            if 'cancel-in-progress' in concurrency:
-                cancel = concurrency.get('cancel-in-progress')
-                if cancel not in ['True', 'true', True] and not is_valid_expression(cancel):
+            # Check if concurrency is a string
+            if isinstance(concurrency, str):
+                if not is_valid_expression(concurrency):
                     self.findings.append(
-                        f"Concurrency configuration for cancel-in-progress is not a boolean, valid GitHub "
-                        f"expression or is not set to True. (cancel-in-progress: {cancel}). "
-                        f"Ensure cancel-in-progress has the right configuration.")
+                        f"Concurrency is set as a string but does not appear to be a valid GitHub expression: "
+                        f"{concurrency}. Ensure the concurrency string is valid."
+                    )
+                # If it's a valid string expression, no further checks are needed
+                return
+
+            # If concurrency is a dictionary, perform detailed checks
+            if isinstance(concurrency, dict):
+                if 'group' not in concurrency or not isinstance(concurrency['group'], str):
+                    self.findings.append(
+                        f"Concurrency configuration is missing the 'group' parameter or it is not a string: "
+                        f"{concurrency.get('group')}. "
+                        f"Ensure 'group' is specified and is a string."
+                    )
+
+                if 'cancel-in-progress' not in concurrency:
+                    self.findings.append(
+                        f"Concurrency configuration is missing the 'cancel-in-progress'. "
+                        f"Ensure 'cancel-in-progress' is specified and is a boolean."
+                    )
+
+                if 'cancel-in-progress' in concurrency:
+                    cancel = concurrency.get('cancel-in-progress')
+                    if cancel not in ['True', 'true', True] and not is_valid_expression(cancel):
+                        self.findings.append(
+                            f"Concurrency configuration for cancel-in-progress is not a boolean, valid GitHub "
+                            f"expression or is not set to True. (cancel-in-progress: {cancel}). "
+                            f"Ensure cancel-in-progress has the right configuration."
+                        )
+            else:
+                self.findings.append(
+                    f"Concurrency configuration is neither a valid string nor a dictionary: {concurrency}. "
+                    f"Ensure the configuration is correct."
+                )
 
         else:
             return self.findings
+
+    # def check_concurrency(self, workflow):
+    #     """
+    #     Check for concurrency issues in the workflow.
+    #
+    #     Args:
+    #         workflow: A Workflow object representing the GitHub Actions workflows.
+    #     """
+    #
+    #     concurrency = workflow.concurrency
+    #
+    #     def is_valid_expression(expression):
+    #         # Simple regex to check for GitHub expression syntax
+    #         return re.match(r"\$\{\{.*\}\}", expression.strip()) is not None
+    #
+    #     if concurrency:
+    #         if 'group' not in concurrency or not isinstance(concurrency['group'], str):
+    #             self.findings.append(
+    #                 f"Concurrency configuration is missing the 'group' parameter or it is not a string: "
+    #                 f"{concurrency.get('group')}. "
+    #                 f"Ensure 'group' is specified and is a string.")
+    #
+    #         if 'cancel-in-progress' not in concurrency:
+    #             self.findings.append(
+    #                 f"Concurrency configuration is missing the cancel-in-progress. "
+    #                 f"Ensure 'cancel-in-progress' is specified and is a boolean.")
+    #
+    #         if 'cancel-in-progress' in concurrency:
+    #             cancel = concurrency.get('cancel-in-progress')
+    #             if cancel not in ['True', 'true', True] and not is_valid_expression(cancel):
+    #                 self.findings.append(
+    #                     f"Concurrency configuration for cancel-in-progress is not a boolean, valid GitHub "
+    #                     f"expression or is not set to True. (cancel-in-progress: {cancel}). "
+    #                     f"Ensure cancel-in-progress has the right configuration.")
+    #
+    #     else:
+    #         return self.findings

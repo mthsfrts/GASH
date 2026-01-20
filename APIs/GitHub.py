@@ -1,6 +1,7 @@
 import requests
 import logging
 import json
+import math
 from bs4 import BeautifulSoup
 
 
@@ -14,7 +15,7 @@ class GitHubAPI:
 
     def get_rate_limit(self):
         url = "https://api.github.com/rate_limit"
-        response = requests.get(url, headers=self.headers)
+        response = requests.get(url, headers=self.headers, timeout=10)
         data = response.json()
         if response.status_code == 200:
             limit = data['resources']['core']['limit']
@@ -30,16 +31,29 @@ class GitHubAPI:
                   f"Error: {response.status_code} - {data['message']}\n")
             return response.status_code
 
-    def has_workflow_files(self, repo_full_name):
+    def has_workflow_files(self, owner, repo_name):
         """Returns the names of the .yml or .yaml files in the
-        .GitHub/workflows folder, or None if there are no file."""
-        workflows_url = f"https://api.github.com/repos/{repo_full_name}/contents/.github/workflows"
+        .GitHub/workflows folder, or None if there are no files."""
+        workflows_url = f"https://api.github.com/repos/{owner}/{repo_name}/contents/.github/workflows"
         response = requests.get(workflows_url, headers=self.headers)
+
         if response.status_code == 200:
-            files = response.json()
-            yml_files = [file['name'] for file in files if file['name'].endswith(('.yml', '.yaml'))]
-            return len(yml_files), yml_files if yml_files else []
-        return 0, []
+            try:
+                files = response.json()
+                if isinstance(files, list):
+                    yml_files = [file['name'] for file in files if file['name'].endswith(('.yml', '.yaml'))]
+                    return len(yml_files), yml_files
+                else:
+                    logging.info(f"Unexpected response format: {files}")
+                    return 0, []
+            except ValueError as e:
+                logging.info(f"Error processing JSON response: {e}")
+                return 0, []
+        elif response.status_code == 404:
+            return 0, []
+        else:
+            logging.info(f"API error: {response.status_code}, {response.text}")
+            return 0, []
 
     def fetch_repo(self, query, sort, order, page):
         """Search and filter repositories for a specific page."""
@@ -48,11 +62,11 @@ class GitHubAPI:
         try:
             url = (f'https://api.github.com/search/repositories?'
                    f'q={query}&sort={sort}&order={order}&per_page=100&page={page}')
-            response = requests.get(url, headers=self.headers)
+            response = requests.get(url, headers=self.headers, timeout=10)
             response.raise_for_status()
 
             for repo in response.json()['items']:
-                repo_name = repo['full_name']
+                repo_name = repo['name']
                 repo_description = repo['description']
                 repo_url = repo['html_url']
                 language = repo['language'] if repo['language'] else 'Unknown'
@@ -65,7 +79,7 @@ class GitHubAPI:
                 size = repo['size']
                 downloads = repo['has_downloads']
 
-                yml_file_count, yml_files = self.has_workflow_files(repo_name)
+                yml_file_count, yml_files = self.has_workflow_files(owner, repo_name)
                 has_yml = bool(yml_files)
 
                 logging.info(f"Verifying Repository: {repo_name} - URL: {repo_url} - YML File Count: {yml_file_count}")
@@ -94,13 +108,27 @@ class GitHubAPI:
 
         return filtered_repos_for_page
 
+    def get_contents(self, owner, repo_name):
+        """Fetch the content of the .github/workflows directory in a repository."""
+        try:
+            url = f'https://api.github.com/repos/{owner}/{repo_name}/contents/.github/workflows'
+            response = requests.get(url, headers=self.headers, timeout=10)
+            response.raise_for_status()
+
+            content = response.json()
+            return content
+
+        except requests.RequestException as e:
+            logging.error(f"Error fetching workflows' content for {owner}/{repo_name}. Error: {e}")
+            return []
+
     def fetch_specific_commit(self, owner, repo_name, commit_sha):
         """Fetch information about a specific commit based on its SHA."""
         filtered_commits = []
 
         try:
             url = f'https://api.github.com/repos/{owner}/{repo_name}/commits/{commit_sha}'
-            response = requests.get(url, headers=self.headers)
+            response = requests.get(url, headers=self.headers, timeout=10)
             response.raise_for_status()
 
             commit = response.json()
@@ -131,7 +159,7 @@ class GitHubAPI:
 
         try:
             url = f'https://api.github.com/repos/{owner}/{repo_name}/issues/{issue_number}'
-            response = requests.get(url, headers=self.headers)
+            response = requests.get(url, headers=self.headers, timeout=10)
             response.raise_for_status()
 
             issue = response.json()
@@ -203,7 +231,7 @@ class GitHubAPI:
             url_bs = f"https://github.com/marketplace/actions/{action_name}"
             response_bs = requests.get(url_bs)
             if response_bs.status_code == 404:
-                logging.warning(f"GitHub Action marketplace page not found for action: {action_name}")
+                # logging.warning(f"GitHub Action marketplace page not found for action: {action_name}")
                 verification_badge = False
             else:
                 response_bs.raise_for_status()
@@ -220,15 +248,255 @@ class GitHubAPI:
         """Fetch the vulnerabilities of a repository."""
 
         url = f'https://api.github.com/repos/{owner}/{name}/security-advisories'
-        response = requests.get(url, headers=self.headers)
-        response.raise_for_status()
+        try:
+            response = requests.get(url, headers=self.headers, timeout=10)
+            response.raise_for_status()
 
-        if response.status_code == 200:
-            vulnerabilities = response.json()
-            if vulnerabilities:
-                return json.dumps(vulnerabilities, indent=4)
-            else:
+            if response.status_code == 200:
+                vulnerabilities = response.json()
+                if vulnerabilities:
+                    return json.dumps(vulnerabilities, indent=4)
+                else:
+                    return None
+
+        except requests.exceptions.HTTPError as e:
+            if response.status_code == 404:
                 return None
-        else:
-            logging.error(f"Error fetching vulnerabilities: {response.text}")
+            else:
+                logging.error(f"Error fetching vulnerabilities for {owner}/{name}: {e}")
+                return None
+
+        except requests.exceptions.RequestException as e:
+            logging.error(f"Error connecting to GitHub API for {owner}/{name}: {e}")
             return None
+
+    def get_workflow_ids(self, owner, name):
+        """
+        Fetch and filter workflows of a repository.
+
+        Args:
+            owner (str): The owner of the repository.
+            name (str): The name of the repository.
+
+        Returns:
+            list: A list of dictionaries containing workflow details.
+        """
+        workflow_details = []
+
+        try:
+            url = f'https://api.github.com/repos/{owner}/{name}/actions/workflows'
+            response = requests.get(url, headers=self.headers, timeout=10)
+            response.raise_for_status()
+
+            workflows = response.json().get("workflows", [])
+
+            for workflow in workflows:
+                workflow_id = workflow["id"]
+                workflow_name = workflow["name"]
+                workflow_state = workflow["state"]
+                created_at = workflow["created_at"]
+                updated_at = workflow["updated_at"]
+                path = workflow["path"]
+
+                logging.info(f"Found Workflow: {workflow_name} - ID: {workflow_id} - State: {workflow_state}")
+                logging.info("-" * 40 + "\n")
+
+                workflow_details.append({
+                    "ID": workflow_id,
+                    "Name": workflow_name,
+                    "State": workflow_state,
+                    "Created At": created_at,
+                    "Updated At": updated_at,
+                    "Path": path
+                })
+
+        except requests.RequestException as e:
+            logging.error(f"Error fetching workflows for {owner}/{name}. Error: {e}")
+
+        return workflow_details
+
+    def get_all_runs(self, owner, repo):
+        """
+        Fetch and filter all the runs of a repository, handling pagination.
+
+        Args:
+            owner (str): The owner of the repository.
+            repo (str): The name of the repository.
+
+        Returns:
+            list: A list of dictionaries containing run details.
+        """
+        runs_details = []
+        page = 1
+        per_page = 100
+        url = f'https://api.github.com/repos/{owner}/{repo}/actions/runs'
+
+        try:
+            while True:
+                params = {'page': page, 'per_page': per_page}
+                response = requests.get(url, headers=self.headers, params=params)
+                response.raise_for_status()
+
+                workflow_runs = response.json().get("workflow_runs", [])
+                total_count = response.json().get("total_count", 0)
+                total_pages = math.ceil(total_count / per_page)
+                logging.info(f"Writing details from page {page} of {total_pages}.")
+
+                for run in workflow_runs:
+                    runs_details.append({
+                        "ID": run["id"],
+                        "Name": run["name"],
+                        "Head Branch": run["head_branch"],
+                        "Path": run["path"],
+                        "Display Title": run["display_title"],
+                        "Run Number": run["run_number"],
+                        "Event": run["event"],
+                        "Status": run["status"],
+                        "Conclusion": run["conclusion"],
+                        "Workflow ID": run["workflow_id"],
+                        "Pull Requests": [
+                            {"ID": pr.get("id"), "Title": pr.get("title"), "URL": pr.get("url")}
+                            for pr in run.get("pull_requests", [])
+                        ],
+                        "Created At": run["created_at"],
+                        "Updated At": run["updated_at"],
+                        "Run Attempt": run["run_attempt"],
+                        "Reference Workflow": run["workflow_url"],
+                        "Actor": {
+                            "Login": run["actor"]["login"],
+                            "ID": run["actor"]["id"],
+                            "HTML URL": run["actor"]["html_url"],
+                            "Type": run["actor"]["type"],
+                            "Site Admin": run["actor"]["site_admin"]
+                        },
+                        "Triggering Actor": {
+                            "Login": run["triggering_actor"]["login"],
+                            "ID": run["triggering_actor"]["id"],
+                            "HTML URL": run["triggering_actor"]["html_url"],
+                            "Type": run["triggering_actor"]["type"],
+                            "Site Admin": run["triggering_actor"]["site_admin"]
+                        },
+                        "Head Commit": {
+                            "ID": run["head_commit"]["id"],
+                            "Message": run["head_commit"]["message"],
+                            "Timestamp": run["head_commit"]["timestamp"],
+                            "Author": {
+                                "Name": run["head_commit"]["author"]["name"],
+                                "Email": run["head_commit"]["author"]["email"]
+                            },
+                            "Committer": {
+                                "Name": run["head_commit"]["committer"]["name"],
+                                "Email": run["head_commit"]["committer"]["email"]
+                            }
+                        },
+                    })
+
+                if len(workflow_runs) < per_page:
+                    break
+
+                page += 1
+
+        except requests.RequestException as e:
+            logging.error(f"Error fetching runs for {owner}/{repo}. Error: {e}")
+
+        return runs_details
+
+    def get_workflow_jobs(self, owner, repo, run_id):
+        """
+        Fetch and filter jobs for a specific workflow run, handling pagination.
+
+        Args:
+            owner (str): The owner of the repository.
+            repo (str): The name of the repository.
+            run_id (int): The ID of the workflow run.
+
+        Returns:
+            list: A list of dictionaries containing job details and associated steps.
+        """
+        jobs_details = []
+        page = 1
+        per_page = 100
+        url = f'https://api.github.com/repos/{owner}/{repo}/actions/runs/{run_id}/jobs'
+        total_count_logged = False
+
+        try:
+            while True:
+                params = {'page': page, 'per_page': per_page}
+                response = requests.get(url, headers=self.headers, params=params)
+                response.raise_for_status()
+
+                jobs = response.json().get("jobs", [])
+                total_count = response.json().get("total_count", 0)
+                total_pages = math.ceil(total_count / per_page)
+
+                if not total_count_logged:
+                    logging.info(f"Found {total_count} jobs for run ID {run_id}.")
+                    total_count_logged = True
+                logging.info(f"Processing page {page} of {total_pages} for run ID {run_id}.")
+
+                for job in jobs:
+                    jobs_details.append({
+                        "ID": job["id"],
+                        "Workflow Name": job["workflow_name"],
+                        "Head Branch": job["head_branch"],
+                        "Run Attempt": job["run_attempt"],
+                        "Status": job["status"],
+                        "Conclusion": job["conclusion"],
+                        "Started At": job["started_at"],
+                        "Completed At": job["completed_at"],
+                        "Name": job["name"],
+                        "Steps": [
+                            {
+                                "Name": step["name"],
+                                "Status": step["status"],
+                                "Conclusion": step.get("conclusion"),
+                                "Number": step["number"],
+                                "Started At": step["started_at"],
+                                "Completed At": step["completed_at"]
+                            }
+                            for step in job.get("steps", [])
+                        ]
+                    })
+
+                if len(jobs) < per_page:
+                    break
+
+                page += 1
+
+        except requests.RequestException as e:
+            logging.error(f"Error fetching jobs for run {run_id} on page {page}: {e}")
+
+        return jobs_details
+
+    def get_log_download_url(self, owner, repo, run_id):
+        """
+        Fetches the download URL for the logs of a specific workflow run.
+
+        Args:
+            owner (str): The owner of the repository.
+            repo (str): The name of the repository.
+            run_id (int): The ID of the workflow run.
+
+        Returns:
+            str: The URL to download the logs.
+            None: If an error occurs or the URL is not available.
+        """
+        try:
+            # Step 1: Call the API to get the logs
+            url = f'https://api.github.com/repos/{owner}/{repo}/actions/runs/{run_id}/logs'
+            response = requests.get(url, headers=self.headers, allow_redirects=False)
+            response.raise_for_status()
+
+            # Step 2: Extract the log download URL from the "Location" header
+            log_download_url = response.headers.get("Location")
+            if log_download_url:
+                logging.info(f"Log's download URL for run {run_id} obtained successfully.")
+                return log_download_url
+            else:
+                logging.error(f"No download URL found for logs of run {run_id}.")
+                return None
+
+        except requests.RequestException as e:
+            logging.error(f"Error fetching log download URL for run {run_id}: {e}")
+            return None
+

@@ -55,8 +55,11 @@ class MainUntrustedDependenciesCheck:
                 if not owner_verified and not verification_badge:
                     findings.append(f"Unverified dependency found in {level}: {uses}. "
                                     f"Consider using actions from verified creators.")
+
                 vulnerabilities = call.get_repository_vulnerabilities(user, repo)
-                if vulnerabilities:
-                    findings.append(f"Vulnerabilities found in {level}: {uses}. "
-                                    f"Details: {vulnerabilities}")
+
+                if vulnerabilities is not None and 404 not in vulnerabilities:
+                    findings.append(f"Vulnerabilities found in {level}: {uses}. Details: {vulnerabilities}")
+
         return findings
+

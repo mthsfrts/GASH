@@ -102,6 +102,9 @@ class MainErrorHandlingCheck:
                                      f"It is recommended to investigate why the job is taking so long to run "
                                      f"and to try to optimize it.")
 
+            else:
+                continue
+
             for step in job.steps:
                 if step.timeout_minutes is None:
                     self.findings.append(f"Step '{step.name}' does not have a timeout set. "
@@ -126,4 +129,6 @@ class MainErrorHandlingCheck:
                                          f"It is recommended to investigate why the step is taking so long to run "
                                          f"and to try to optimize it.")
 
+                else:
+                    continue
         return self.findings

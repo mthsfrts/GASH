@@ -1,0 +1,148 @@
+import pytest
+import logging
+from Analysis.Smells.Categories.Security.HardCoded.HardCodedFct import HardCodedFct
+from Analysis.DataStruct import Workflow, Jobs, Steps
+from Analysis.Parse.ActionParser import Action
+
+logging.basicConfig(level=logging.DEBUG)
+
+
+@pytest.fixture
+def workflow():
+    """
+    Workflow com múltiplos secrets hardcoded em diferentes níveis
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {"API_KEY": "my_secret_key"}
+
+    job = Jobs.Job()
+    job.env = {"DB_PASSWORD": "super_secret_password"}
+
+    step = Steps.Step()
+    step.run = "echo 'my_secret_key'"
+    step.env = {"TOKEN": "another_secret_token"}
+
+    job.steps.append(step)
+    workflow.jobs = {"build": job}
+
+    return workflow
+
+
+def test_hard_coded_secret_detection(workflow):
+    """
+    Deve detectar secrets hardcoded em:
+    - env do workflow
+    - env do job
+    - env do step
+    - comando run do step
+    """
+    logging.debug(f"Running test_hard_coded_secret_detection with workflow: {workflow}")
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+    logging.debug(f"Findings: {findings}")
+
+    expected_findings = [
+        "Hard-coded secret in workflow env 'API_KEY'",
+        "Hard-coded secret in job build env 'DB_PASSWORD'",
+        "Hard-coded secret in step in job build env 'TOKEN'",
+        "Hard-coded secret in step in job build run command 'echo 'my_secret_key''"
+    ]
+
+    assert findings == expected_findings
+
+
+def test_safe_secret_not_detected():
+    """
+    Secrets referenciados via ${{ secrets.X }} não devem ser detectados
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {"API_KEY": "${{ secrets.API_KEY }}"}
+
+    job = Jobs.Job()
+    job.env = {}
+    job.steps = []
+
+    workflow.jobs = {"build": job}
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+
+    assert findings == []
+
+
+def test_clean_workflow_no_findings():
+    """
+    Workflow limpo não deve gerar findings
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {}
+
+    job = Jobs.Job()
+    job.env = {}
+    job.steps = []
+
+    workflow.jobs = {"build": job}
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+
+    assert findings == []
+
+
+def test_secret_in_comment_not_detected():
+    """
+    Secrets apenas em comentários não devem ser detectados
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {}
+
+    job = Jobs.Job()
+    job.env = {}
+
+    step = Steps.Step()
+    step.run = "# token=abc123"
+    step.env = {}
+
+    job.steps = [step]
+    workflow.jobs = {"build": job}
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+
+    assert findings == []
+
+
+def test_integration():
+    """
+    Teste de integração com workflow real
+    """
+    logging.debug("Running test_integration")
+    action = Action(file_path="../../Yamls/Smells/Prisma/manage-dist-tag.yml")
+    workflow = action.prepare_for_analysis()
+    logging.debug(f"Parsed workflow: {workflow}")
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+    logging.debug(f"Findings: {findings}")
+
+    expected_findings = [
+        "Hard-coded secret in step in job manage_tag run command 'echo "
+        '"//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc\n'
+        '\n'
+        'echo "The following commands will be executed, for example:"\n'
+        'echo "npm dist-tag \'${{ env.ACTION }}\' \'@prisma/client${{ env.VERSION '
+        '}}\' \'${{ env.TAG_NAME }}\'"\n'
+        '\n'
+        'sleep 10\n'
+        '\n'
+        'npm dist-tag "${{ env.ACTION }}" "@prisma/client${{ env.VERSION }}" "${{ '
+        'env.TAG_NAME }}"\n'
+        'npm dist-tag "${{ env.ACTION }}" "prisma${{ env.VERSION }}" "${{ '
+        'env.TAG_NAME }}"\n'
+        '\n'
+        'npm dist-tag "${{ env.ACTION }}" "@prisma/adapter-d1${{ env.VERSION }}" "${{ '
+        'env.TAG_NAME }}"\n'
+        "'"
+    ]
+
+    assert findings == expected_findings
