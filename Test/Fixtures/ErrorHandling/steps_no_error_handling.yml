@@ -1,0 +1,8 @@
+name: No Error Handling
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Raw Command
+        run: npm install

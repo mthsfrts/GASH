@@ -1,0 +1,10 @@
+name: Output Validation
+on: push
+jobs:
+  process:
+    runs-on: ubuntu-latest
+    steps:
+      - id: set_val
+        run: echo "result=fail" >> $GITHUB_OUTPUT
+      - name: Use Output
+        run: echo ${{ steps.set_val.outputs.result }}
