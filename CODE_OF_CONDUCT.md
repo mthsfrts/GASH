@@ -1,90 +1,94 @@
-# Código de Conduta do Projeto GASH
-
-## Nossa Filosofia
-
-Acreditamos que o ambiente mais produtivo, inovador e agradável é aquele que é **acolhedor**, **respeitoso** e **seguro** para todos, independentemente do nível de experiência ou função dentro da **SQUAD**.
-
-***Críticas devem ser sempre direcionadas ao código, nunca à pessoa.***
-
-Este Código de Conduta estabelece os padrões de comportamento esperado para todos os participantes do projeto GASH, reforçando que o foco deve estar no crescimento técnico e no aprendizado colaborativo.
+# Código de Conduta do GASH
 
 ## Nosso Compromisso
 
-O projeto GASH se compromete a fornecer um ambiente livre de assédio para todos, independentemente de idade, tamanho corporal, deficiência visível ou invisível, etnia, características sexuais, identidade e expressão de gênero, nível de experiência, educação, status socioeconômico, nacionalidade, aparência pessoal, raça, religião ou orientação sexual.
+Nós, membros, colaboradores e responsáveis pelo projeto GASH, nos comprometemos a tornar a participação na comunidade uma experiência livre de assédio para todas as pessoas, independentemente de idade, tipo físico, deficiência visível ou invisível, etnia, características sexuais, identidade e expressão de gênero, nível de experiência, escolaridade, condição socioeconômica, nacionalidade, aparência pessoal, raça, religião, orientação ou identidade sexual.
 
-Comprometemo-nos a agir e interagir de formas que contribuam para uma comunidade aberta, acolhedora, diversificada, inclusiva e saudável.
+Comprometemo-nos a agir e interagir de maneiras que promovam uma comunidade aberta, acolhedora, diversa, inclusiva e saudável.
 
-## Comportamentos Esperados
+## Padrões de Comportamento
 
-Os seguintes comportamentos são considerados essenciais para contribuir para um ambiente positivo:
+Comportamentos que contribuem para um ambiente positivo:
 
-* **Demonstrar empatia e bondade** para com os outros.
-* **Respeitar opiniões, pontos de vista e experiências diferentes.** Entender que a diversidade de perspectivas leva a soluções melhores.
-* **Fornecer e receber *feedback* de forma graciosa e construtiva.** No contexto de *Code Review* (revisão de código), isso significa:
-    * As críticas devem ser **técnicas** e **objetivas**.
-    * Explicar o *porquê* de uma sugestão, focando em melhorias para o código e no aprendizado.
-    * Evitar linguagem depreciativa ou sarcástica.
-* **Aceitar a responsabilidade** e pedir desculpas àqueles afetados pelos nossos erros, aprendendo com a experiência.
-* **Focar no que é melhor para a comunidade** em geral, e não apenas para nós como indivíduos.
-* **Comunicação Clara e Transparente** em canais de *squads*, *issues* e *pull requests*.
+- Demonstrar empatia e gentileza com as demais pessoas.
+- Respeitar opiniões, pontos de vista e experiências diferentes.
+- Oferecer e receber feedback construtivo com cortesia.
+- Assumir responsabilidade por erros, pedir desculpas quando apropriado e aprender com a experiência.
+- Priorizar o bem-estar da comunidade em vez de interesses individuais.
 
-## Comportamentos Inaceitáveis
+Comportamentos inaceitáveis incluem (mas não se limitam a):
 
-Exemplos de comportamentos inaceitáveis incluem:
+- Uso de linguagem ou imagens sexualizadas; atenção ou avanços sexuais indesejados.
+- Provocações (trolling), insultos, comentários depreciativos ou ataques pessoais ou políticos.
+- Assédio público ou privado.
+- Publicação de informações privadas de terceiros (por exemplo, endereço físico ou e-mail) sem permissão explícita.
+- Comportamento que possa ser razoavelmente considerado inadequado em um ambiente profissional.
 
-* O uso de **linguagem ou imagens sexualizadas** e atenção ou **abordagem sexual de qualquer tipo**.
-* **Comentários depreciativos** (*trolling*), insultuosos ou pejorativos, e ataques pessoais ou políticos.
-* **Assédio** em geral.
-* **Contato não solicitado** ou fotos digitais em canais do projeto.
-* **Publicação ou ameaça** de publicação de informações de identificação pessoal de outras pessoas (*Doxing*).
-* Outras condutas que são razoavelmente consideradas inadequadas em um ambiente profissional.
-* **Abuso de permissões** ou mau uso do repositório, incluindo *spam* excessivo ou apropriação indevida de *issues* ou *pull requests*.
+## A quem se aplica este código?
 
-## Processo de Reporte e Aplicação
+Este Código de Conduta se aplica a todas as pessoas que participam das atividades do GASH: mantenedores, contribuidores, colaboradores, revisores, designers, tradutores, pessoas que abrem issues, realizam pull requests, participam de discussões em fóruns relacionados ou representam o projeto em eventos e canais oficiais.
 
-A prioridade é garantir que o processo de denúncia seja **direto, privado e proteja a vítima**.
+## Onde se aplica?
 
-### Como Reportar
+Aplica‑se a todos os espaços comunitários e canais de comunicação vinculados ao projeto, repositórios, listas de discussão, chats, fóruns, redes sociais oficiais e eventos online ou presenciais, e também quando alguém estiver atuando como representante oficial do projeto (por exemplo, usando e‑mails oficiais, contas de redes sociais do projeto ou apresentando‑se como membro do GASH).
 
-Se você está sendo assediado, percebeu que outra pessoa está sendo assediada, ou tem quaisquer outras preocupações, por favor, entre em contato imediatamente com os **Project Maintainers** (Mantenedores do Projeto) através de um canal privado.
+## Responsabilidades de Aplicação
 
-O contato deve ser feito via **e-mail dedicado** ou **formulário online**, garantindo a confidencialidade e tirando o peso da gestão de conflitos das mãos de outros pares técnicos (*Squad Leads*).
+Os responsáveis pela comunidade (mantenedores, administradores e moderadores) têm a responsabilidade de esclarecer e aplicar estes padrões de comportamento. Eles poderão, quando necessário, remover, editar ou rejeitar comentários, commits, código, wikis, issues e outras contribuições que não estejam alinhadas com este Código de Conduta, explicando a decisão quando apropriado.
 
-**Canal de Contato (E-mail/Formulário Anônimo):** [INSERIR E-MAIL DEDICADO AQUI]
+Os responsáveis devem agir de maneira justa, proporcional e consistente, preservando a segurança e a privacidade das pessoas envolvidas.
 
-### Aplicação
+## Como denunciar
 
-Os **Project Maintainers** são responsáveis por esclarecer os padrões de comportamento e tomar medidas corretivas apropriadas e justas em resposta a qualquer caso de comportamento inaceitável.
+Relatos de comportamento abusivo, assédio ou outras violações devem ser encaminhados para os responsáveis pelo repositório.
 
-**O fluxo escalonado de Membro da Squad -> Squad Lead -> Project Maintainer** para denúncias de má conduta e pode gerar conflitos de interesse. O canal de denúncia deve ser **direto e privado** com os **Project Maintainers**.
+Observações importantes sobre o relato:
+- Inclua o máximo de informação possível: links, mensagens, commits, datas, horários e nomes de envolvidos.
+- Se preferir, crie uma cópia do conteúdo relevante antes de removê‑lo (quando aplicável).
+- Substitua o e‑mail acima pelo contato oficial do seu projeto caso o GASH tenha outro canal de denúncia.
 
-Os Project Maintainers têm o direito e a responsabilidade de remover, editar ou rejeitar comentários, *commits*, código e outras contribuições que não se alinhem com este Código de Conduta, e irão comunicar as razões para as decisões de moderação quando apropriado.
+Todas as denúncias serão analisadas de forma rápida, justa e confidencial. A equipe de aplicação respeitará a privacidade e a segurança do denunciante e das pessoas mencionadas no relato.
 
-### Diretrizes de Aplicação
+## Diretrizes de Aplicação (Escalonamento de Impacto)
 
-As consequências para o descumprimento do Código de Conduta podem incluir:
+A equipe de aplicação avaliará cada caso com base na gravidade, intenção, impacto e contexto, e aplicará medidas proporcionais, conforme as diretrizes abaixo:
 
-1.  **Advertência:** Uma comunicação privada e escrita dos Project Maintainers fornecendo clareza sobre a natureza da violação e uma explicação do porquê o comportamento foi inadequado.
-2.  **Suspensão Temporária:** Uma proibição temporária de qualquer forma de contribuição ou interação no projeto.
-3.  **Banimento Permanente:** A exclusão permanente da interação no projeto.
+1. Correção
+- Impacto na comunidade: Uso de linguagem inadequada ou comportamento não profissional/indesejado.
+- Consequência: Advertência privada por escrito, explicando a natureza da violação e por que o comportamento foi inapropriado; pode ser solicitada uma retratação pública.
 
-## Referências
+2. Aviso
+- Impacto na comunidade: Violação por incidente isolado ou por uma sequência curta de ações.
+- Consequência: Aviso formal com condições (por exemplo, suspensão de interações com determinadas pessoas por um período). Violação repetida pode levar a suspensão temporária.
 
-Este Código de Conduta é adaptado do [Contributor Covenant, versão 2.1](https://www.contributor-covenant.org/pt-br/version/2/1/code_of_conduct/).
-Também leva em conta o [Seu Código de Conduta | Open Source Guides](https://opensource.guide/pt/code-of-conduct/).
+3. Suspensão Temporária
+- Impacto na comunidade: Violações sérias ou comportamento persistente inadequado.
+- Consequência: Banimento temporário de interações públicas e privadas com a comunidade por período determinado; proibição de participação em canais oficiais durante a suspensão.
 
-## Contriuidores na escrita e tomada de decição do documento de código de conduta
+4. Banimento Permanente
+- Impacto na comunidade: Padrão consistente de violação de normas, assédio direcionado, ou comportamento que coloque em risco a segurança ou bem‑estar de membros.
+- Consequência: Banimento permanente da comunidade e revogação de acessos relacionados ao projeto.
 
-[Arthur Brito](https://github.com/arthurbrit0)
+A equipe de aplicação pode optar por combinar medidas, aplicar ações administrativas (remoção de privilégios de escrita/merge), limitar acessos, ou tomar outras medidas necessárias ao caso, sempre documentando as decisões quando apropriado.
 
-[Caio Macedo](https://github.com/caioamac9)
+## Mediação e Apelação
 
-[João Vitor](https://github.com/joaovitormgv)
+- Oferecemos, quando aplicável, um processo de apelação para decisões de aplicação. Instruções sobre como apelar serão fornecidas na comunicação da decisão.
+- A apelação será revisada por alguém não envolvido na investigação original, buscando imparcialidade.
 
-[José Alberto](https://github.com/Jose-Alberto-Rodrigues-Neto)
+## Privacidade e Divulgação
 
-[Victor de Oliveira](https://github.com/01Vitu)
+- A identidade do denunciante será preservada na medida do possível.
+- Informações sobre incidentes serão compartilhadas apenas com pessoas diretamente envolvidas na investigação e na aplicação das medidas.
+- Em casos onde haja risco legal ou de segurança, poderemos divulgar informações a autoridades competentes quando exigido por lei.
 
-[Guilherme Gondim](https://github.com/guilhermeglga)
+## Boas Práticas para Contribuições Técnicas
 
-[Guilherme Martins](https://github.com/jguilimartins)
+- Submeta pull requests com descrições claras e relevantes.
+- Respeite o processo de revisão, comentários devem ser construtivos e focados no código/funcionalidade, não em características pessoais.
+- Antes de abrir uma issue, verifique se não existe outra igual e teste reproduzibilidade de bugs.
+- Valorize acessibilidade e documentação: explique decisões complexas e mantenha o repositório utilizável por diferentes níveis de experiência.
+
+## Aplicação Internacional e Acessibilidade
+
+Este documento foi escrito em português e deve ser considerado sempre no contexto do respeito à diversidade cultural. Quando for necessário, traduções ou adaptações locais podem ser feitas, desde que preservem os princípios aqui descritos. Se precisar de assistência para comunicar medidas ou para adaptar conteúdo, a equipe de aplicação oferecerá suporte.
