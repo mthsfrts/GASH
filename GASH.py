@@ -81,7 +81,7 @@ class GASH:
     def main(self):
         parser = argparse.ArgumentParser(
             description='GASH - GitHub Actions Smells Hunter',
-            epilog='For more information, visit https://yourprojectdocs.example.com',
+            epilog='For more information, visit https://github.com/mthsfrts/GASH',
             formatter_class=argparse.RawDescriptionHelpFormatter,
             usage='%(prog)s [-h] [-d] <command> [subcommand]',
         )
@@ -95,8 +95,9 @@ class GASH:
             description='Mine GitHub repositories based on age and stars.'
         )
         parser_repo.add_argument('--age', type=int, help='The age of the repository in years.')
-        parser_repo.add_argument('--min', type=str, help='The minimum number of stars to search.')
-        parser_repo.add_argument('--max', type=str, help='The maximum number of stars to search.')
+        parser_repo.add_argument('--min', type=int, help='The minimum number of stars to search.')
+        parser_repo.add_argument('--max', type=int, help='The maximum number of stars to search.')
+        parser_repo.add_argument('--intervals', type=int, help='The number of intervals to search.')
 
         parser_mine = subparsers.add_parser(
             'commits',
@@ -172,6 +173,7 @@ class GASH:
                         continue
                 elif answer1 == 'no':
                     _token = input("Please enter your GitHub API token: ")
+                    break
                 else:
                     print("Invalid input. Please enter 'yes' or 'no'.")
                     continue
@@ -194,16 +196,19 @@ class GASH:
             age = args.age
             _min = args.min
             _max = args.max
+            _intervals = args.intervals
 
             if not age or not _min or not max:
                 print("I need you to fill out some information to mine the GitHub repository.")
                 age = input("Please enter the age of the repository in years: ")
                 _min = input("Please enter the min number for the stars: ")
                 _max = input("Please enter the max number for the stars: ")
+                _intervals = input("Please enter the number of intervals to search: ")
 
-            print(f"Mining that match the filters age max {age} and stars between {_min} and {_max}...")
+            print(f"Mining that match the filters age max {age} and stars between {_min} and {_max}, "
+                  f"with {_intervals} intervals.")
             worker = self.miner.Mining(_token)
-            worker.repo(age, _min, _max)
+            worker.repo(age, _min, _max, _intervals)
 
         elif args.command == 'commits':
             url = args.url

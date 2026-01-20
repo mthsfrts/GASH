@@ -54,19 +54,24 @@ class Config:
                 return True
         return False
 
-    def reading_repos(self, url_column):
+    def reading_csv(self, *columns):
         """
-        Reads the CSV file containing repository URLs.
+        Reads the CSV file containing repository details and dynamically returns specified columns.
+
+        Args:
+            *columns: Variable length argument. Indices of the columns to be returned.
 
         Yields:
-            str: The URL of each repository read from the CSV file.
+            tuple: A tuple containing values from the specified columns for each row.
         """
         with open(self.csv_path, mode='r', newline='', encoding='utf-8') as file:
-            reader = csv.reader(file)
+            reader = csv.reader(file, delimiter=';')
             next(reader)
             for row in reader:
-                repo_url = row[url_column]
-                yield repo_url
+                if len(columns) == 1:
+                    yield row[columns[0]]
+                else :
+                    yield tuple(row[col] for col in columns)
 
     @staticmethod
     def get_base_directory():
