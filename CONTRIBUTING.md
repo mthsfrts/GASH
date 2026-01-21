@@ -5,7 +5,7 @@ Primeiramente, agradecemos por dedicar-se a colaborar com o projeto GASH - **The
 ### Existem várias maneiras de contribuir:
 
 - Reportar bugs ou solicitar novas funcionalidades através de Issues.
-- Resolver issues abertas no código existente.
+- Resolver issues abertas no código existente. 
 - Melhorar a documentação.
 - Sugerir refatorações e melhorias de performance.
 
