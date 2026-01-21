@@ -1,224 +1,224 @@
-# Suite de Testes E2E do GASH
+# GASH E2E Test Suite
 
-Suite completa de testes end-to-end para a ferramenta CLI GASH (GitHub Actions Smell Hunter).
+Comprehensive end-to-end test suite for the GASH (GitHub Actions Smell Hunter) CLI tool.
 
-## Visão Geral
+## Overview
 
-Esta suite de testes valida a funcionalidade do GASH através de 7 cenários principais:
+This test suite validates GASH functionality across 7 key scenarios:
 
-| Cenário | Descrição | Testes | Token Necessário |
+| Scenario | Description | Tests | Token Required |
 |----------|-------------|-------|----------------|
-| **1. Repositório Limpo** | Valida ausência de falsos positivos em workflows limpos | 6 | Opcional |
-| **2. Detecção Multi-Smell** | Testa detecção de smells de segurança, manutenção e qualidade | 21 | Opcional |
-| **3. Repositório Real** | Analisa repositórios do mundo real (actions/starter-workflows) | 9 | Sim |
-| **4. Modos de Execução** | Testa comandos CLI (analyze, batch-analyze) | 23 | Misto |
-| **5. Geração de Relatórios** | Valida formato e completude do output | 21 | Misto |
-| **6. Performance** | Testa escalabilidade e tempo de execução | 9 | Não |
-| **7. Tratamento de Erros** | Testa robustez com inputs malformados | 14 | Não |
+| **1. Clean Repository** | Validates no false positives on clean workflows | 6 | Optional |
+| **2. Multi-Smell Detection** | Tests detection of security, maintenance, and quality smells | 21 | Optional |
+| **3. Real Repository** | Analyzes real-world repositories (actions/starter-workflows) | 9 | Yes |
+| **4. Execution Modes** | Tests CLI commands (analyze, batch-analyze) | 23 | Mixed |
+| **5. Report Generation** | Validates output format and completeness | 21 | Mixed |
+| **6. Performance** | Tests scalability and execution time | 9 | No |
+| **7. Error Handling** | Tests robustness with malformed inputs | 14 | No |
 | **Total** | | **103** | |
 
-## Início Rápido
+## Quick Start
 
-### Pré-requisitos
+### Prerequisites
 
 ```bash
-# Instalar dependências
+# Install dependencies
 pip install -r requirements.txt
 
-# Instalar dependências de teste (opcional para testes de memória)
+# Install test dependencies (optional for memory tests)
 pip install psutil
 ```
 
-### Executando Testes Localmente
+### Running Tests Locally
 
 ```bash
-# Executar todos os testes sem token real (modo mock)
+# Run all tests without real token (mock mode)
 pytest Test/E2E/ -v -m "not requires_real_token"
 
-# Executar todos os testes com token real
-export GITHUB_TOKEN=seu_token_aqui
+# Run all tests with real token
+export GITHUB_TOKEN=your_token_here
 pytest Test/E2E/ -v
 
-# Executar cenário específico
+# Run specific scenario
 pytest Test/E2E/test_scenario1_clean_repoTs.py -v
 
-# Executar com cobertura
+# Run with coverage
 pytest Test/E2E/ -v --cov=Analysis --cov-report=html
 ```
 
-### Executando no CI/CD
+### Running in CI/CD
 
-A suite de testes executa automaticamente no GitHub Actions:
+The test suite automatically runs on GitHub Actions:
 
-- **Testes Mock Token**: Executam em push/PR para branches `prod` ou `main`
-- **Testes Token Real**: Executam em push para `prod` ou `main` (usa `secrets.GITHUB_TOKEN`)
-- **Suite Completa**: Acionada manualmente via `workflow_dispatch`
+- **Mock Token Tests**: Run on push/PR to `prod` or `main` branches
+- **Real Token Tests**: Run on push to `prod` or `main` (uses `secrets.GITHUB_TOKEN`)
+- **Complete Suite**: Manually triggered via `workflow_dispatch`
 
-## Cenários de Teste
+## Test Scenarios
 
-### Cenário 1: Análise de Repositório Limpo
+### Scenario 1: Clean Repository Analysis
 
-**Propósito**: Verificar que workflows limpos e bem configurados não geram falsos positivos.
+**Purpose**: Verify that clean, well-configured workflows do not trigger false positives.
 
-**Arquivos de Teste**: `test_scenario1_clean_repoTs.py`
+**Test Files**: `test_scenario1_clean_repoTs.py`
 
-**Testes Principais**:
-- Todos os 9 detectores retornam sem findings para workflows limpos
-- Análise de repositório real (actions/starter-workflows) sem falsos positivos
+**Key Tests**:
+- All 9 detectors return no findings for clean workflows
+- Real repository (actions/starter-workflows) analysis without false positives
 
-**Problemas Conhecidos**:
-- ⚠️ Detector **ErrorHandling** reporta falsos positivos sobre valores de timeout (bug)
-- ⚠️ Detector **Misconfiguration** reporta falsos positivos sobre parâmetros `defaults` e `run`/`uses` faltantes (bug)
-- Estes são bugs documentados nos detectores, não falhas de teste
+**Known Issues**:
+- ⚠️ **ErrorHandling** detector reports false positives about timeout values (bug)
+- ⚠️ **Misconfiguration** detector reports false positives about missing `defaults` and `run`/`uses` parameters (bug)
+- These are documented bugs in the detectors, not test failures
 
-### Cenário 2: Detecção Multi-Smell
+### Scenario 2: Multi-Smell Detection
 
-**Propósito**: Validar detecção de todos os 9 tipos de smell em múltiplos workflows.
+**Purpose**: Validate detection of all 9 smell types across multiple workflows.
 
-**Arquivos de Teste**: `test_scenario2_multi_smellsTs.py`
+**Test Files**: `test_scenario2_multi_smellsTs.py`
 
-**Testes Principais**:
-- Smells de segurança: AdminByDefault, HardCoded, UnsecureProtocol, RemoteTriggers
-- Smells de manutenção: CodeReplica, ErrorHandling, Misconfiguration
-- Smells de qualidade: LongBlocks
-- Validação com repositório real OWASP Juice Shop
+**Key Tests**:
+- Security smells: AdminByDefault, HardCoded, UnsecureProtocol, RemoteTriggers
+- Maintenance smells: CodeReplica, ErrorHandling, Misconfiguration
+- Quality smells: LongBlocks
+- Real-world validation with OWASP Juice Shop repository
 
-**Fixtures Utilizados**:
-- `vulnerable_workflow.yml`: Múltiplos smells de segurança
-- `maintenance_issues.yml`: Padrões de smells de manutenção
-- `complex_workflow.yml`: Todos os 9 tipos de smell
+**Fixtures Used**:
+- `vulnerable_workflow.yml`: Multiple security smells
+- `maintenance_issues.yml`: Maintenance smell patterns
+- `complex_workflow.yml`: All 9 smell types
 
-### Cenário 3: Análise de Repositório Real
+### Scenario 3: Real Repository Analysis
 
-**Propósito**: Testar robustez com workflows GitHub Actions de produção.
+**Purpose**: Test robustness with production GitHub Actions workflows.
 
-**Arquivos de Teste**: `test_scenario3_real_repoTs.py`
+**Test Files**: `test_scenario3_real_repoTs.py`
 
-**Testes Principais**:
-- Análise completa sem crashes (>90% taxa de sucesso)
-- Tratamento de estruturas de workflow diversas
-- Resultados consistentes entre múltiplas execuções
-- Estabilidade de memória durante análise de repositório
+**Key Tests**:
+- Complete analysis without crashes (>90% success rate)
+- Handling diverse workflow structures
+- Consistent results across multiple runs
+- Memory stability during repository analysis
 
-**Repositório Real**: `actions/starter-workflows` (clonado em runtime)
+**Real Repository**: `actions/starter-workflows` (cloned at runtime)
 
-### Cenário 4: Modos de Execução
+### Scenario 4: Execution Modes
 
-**Propósito**: Validar diferentes modos de execução CLI e consistência.
+**Purpose**: Validate different CLI execution modes and consistency.
 
-**Arquivos de Teste**: `test_scenario4_exec_modesTs.py`
+**Test Files**: `test_scenario4_exec_modesTs.py`
 
-**Testes Principais**:
-- Análise de arquivo único (`analyze --file`)
-- Análise batch de diretório (`batch-analyze --dir`)
-- Consistência entre modos single e batch
-- Casos extremos (diretórios vazios, arquivos inexistentes, paths relativos/absolutos)
+**Key Tests**:
+- Single file analysis (`analyze --file`)
+- Batch directory analysis (`batch-analyze --dir`)
+- Consistency between single and batch modes
+- Edge cases (empty dirs, nonexistent files, relative/absolute paths)
 
-### Cenário 5: Geração de Relatórios
+### Scenario 5: Report Generation
 
-**Propósito**: Validar formato de output e completude do relatório.
+**Purpose**: Validate output format and report completeness.
 
-**Arquivos de Teste**: `test_scenario5_report_genTs.py`
+**Test Files**: `test_scenario5_report_genTs.py`
 
-**Testes Principais**:
-- Formato de output no console ("Findings for {detector}:")
-- Todos os 9 detectores representados no output
-- Findings contêm informações acionáveis
-- Resultados determinísticos e consistentes
+**Key Tests**:
+- Console output format ("Findings for {detector}:")
+- All 9 detectors represented in output
+- Findings contain actionable information
+- Deterministic and consistent results
 
-### Cenário 6: Performance e Escalabilidade
+### Scenario 6: Performance and Scalability
 
-**Propósito**: Garantir que GASH atende requisitos de performance.
+**Purpose**: Ensure GASH meets performance requirements.
 
-**Arquivos de Teste**: `test_scenario6_performanceTs.py`
+**Test Files**: `test_scenario6_performanceTs.py`
 
-**Requisitos de Performance**:
-- Workflow único: < 30 segundos
-- Batch 50+ workflows: < 5 minutos
-- Uso de memória: < 500 MB pico
-- Throughput: > 1 workflow/segundo
+**Performance Requirements**:
+- Single workflow: < 30 seconds
+- Batch 50+ workflows: < 5 minutes
+- Memory usage: < 500 MB peak
+- Throughput: > 1 workflow/second
 
-**Testes Principais**:
-- Performance de workflow único
-- Análise batch com 50+ workflows gerados
-- Escalabilidade com 100 workflows simples
-- Estabilidade de memória (sem vazamentos)
+**Key Tests**:
+- Single workflow performance
+- Batch analysis with 50+ generated workflows
+- Scalability with 100 simple workflows
+- Memory stability (no leaks)
 
-### Cenário 7: Tratamento de Erros
+### Scenario 7: Error Handling
 
-**Propósito**: Validar tratamento gracioso de inputs inválidos e casos extremos.
+**Purpose**: Validate graceful handling of invalid inputs and edge cases.
 
-**Arquivos de Teste**: `test_scenario7_error_handlingTs.py`
+**Test Files**: `test_scenario7_error_handlingTs.py`
 
-**Testes Principais**:
-- Tratamento de YAML malformado (sem crashes)
-- Tratamento de arquivo/diretório inexistente
-- Tratamento de diretório vazio
-- Unicode e valores nulos
-- Workflows muito grandes
-- Análise funciona sem chamadas de API
+**Key Tests**:
+- Malformed YAML handling (no crashes)
+- Nonexistent file/directory handling
+- Empty directory handling
+- Unicode and null values
+- Very large workflows
+- Analysis works without API calls
 
-## Gestão de Tokens
+## Token Handling
 
-A suite de testes usa uma estratégia dual de tokens:
+The test suite uses a dual token strategy:
 
-### Mock Token (Desenvolvimento Local)
+### Mock Token (Local Development)
 
-Para testes que não requerem acesso à API do GitHub:
+For tests that don't require GitHub API access:
 
 ```python
 @pytest.fixture
 def mock_token_env(mock_token, tmp_path):
-    """Cria config temporária com mock token"""
+    """Creates temporary config with mock token"""
 ```
 
-**Uso**: Automaticamente usado para testes sem `@pytest.mark.requires_real_token`
+**Usage**: Automatically used for tests without `@pytest.mark.requires_real_token`
 
-### Token Real (Testes CI/Integração)
+### Real Token (CI/Integration Tests)
 
-Para testes que requerem API do GitHub:
+For tests requiring GitHub API:
 
 ```python
 @pytest.fixture
 def ci_token_env(real_token):
-    """Usa GITHUB_TOKEN do environment"""
+    """Uses GITHUB_TOKEN from environment"""
 ```
 
-**Configuração**:
+**Setup**:
 ```bash
-export GITHUB_TOKEN=seu_token_aqui
+export GITHUB_TOKEN=your_token_here
 pytest Test/E2E/ -v -m "requires_real_token"
 ```
 
-**CI**: Usa automaticamente `secrets.GITHUB_TOKEN` no GitHub Actions
+**CI**: Automatically uses `secrets.GITHUB_TOKEN` in GitHub Actions
 
-## Adicionando Novos Testes
+## Adding New Tests
 
-### 1. Escolha o Cenário Apropriado
+### 1. Choose the Appropriate Scenario
 
-Adicione testes ao arquivo de cenário relevante baseado no que você está testando:
-- Precisão de detecção → Cenário 1 ou 2
-- Funcionalidade CLI → Cenário 4
-- Formato de output → Cenário 5
-- Performance → Cenário 6
-- Casos de erro → Cenário 7
+Add tests to the relevant scenario file based on what you're testing:
+- Detection accuracy → Scenario 1 or 2
+- CLI functionality → Scenario 4
+- Output format → Scenario 5
+- Performance → Scenario 6
+- Error cases → Scenario 7
 
-### 2. Siga o Padrão de Teste
+### 2. Follow the Test Pattern
 
 ```python
 class TestYourFeature:
     """
-    Breve descrição do que esta classe de teste valida
+    Brief description of what this test class validates
     """
 
     @pytest.fixture
     def your_fixture(self, fixtures_path):
-        """Setup dos dados de teste"""
+        """Setup test data"""
         return fixtures_path / "your_workflow.yml"
 
     def test_your_feature(self, your_fixture):
         """
-        Descrição do teste seguindo padrão Given-When-Then.
+        Test description following Given-When-Then pattern.
         """
         # Arrange
         action = Action(file_path=str(your_fixture))
@@ -228,144 +228,144 @@ class TestYourFeature:
         findings = YourDetectorFct(content=workflow).detect()
 
         # Assert
-        assert expected_condition, "Mensagem de erro"
+        assert expected_condition, "Error message"
 ```
 
-### 3. Marque Testes Apropriadamente
+### 3. Mark Tests Appropriately
 
 ```python
-@pytest.mark.requires_real_token  # Precisa API do GitHub
-@pytest.mark.slow                  # Leva > 1 segundo
+@pytest.mark.requires_real_token  # Needs GitHub API
+@pytest.mark.slow                  # Takes > 1 second
 ```
 
-### 4. Adicione Fixture Se Necessário
+### 4. Add Fixture if Needed
 
-Se você precisar de um novo workflow fixture:
+If you need a new workflow fixture:
 
-1. Crie `Test/E2E/fixtures/workflows/your_workflow.yml`
-2. Documente os smells que ele contém (como comentários)
-3. Referencie no teste via fixture `fixtures_path`
+1. Create `Test/E2E/fixtures/workflows/your_workflow.yml`
+2. Document the smells it contains (as comments)
+3. Reference in test via `fixtures_path` fixture
 
 ## Fixtures
 
-### Fixtures de Workflow
+### Workflow Fixtures
 
-| Fixture | Propósito | Smells |
+| Fixture | Purpose | Smells |
 |---------|---------|--------|
-| `clean_workflow.yml` | Golden master (sem smells) | Nenhum |
-| `vulnerable_workflow.yml` | Smells de segurança | AdminByDefault, HardCoded, UnsecureProtocol, RemoteTriggers, UntrustedDependencies |
-| `maintenance_issues.yml` | Smells de manutenção | CodeReplica, ErrorHandling, Misconfiguration |
-| `complex_workflow.yml` | Todos os tipos de smell | Todos os 9 tipos |
-| `malformed_workflow.yml` | Tratamento de erros | YAML inválido |
+| `clean_workflow.yml` | Golden master (no smells) | None |
+| `vulnerable_workflow.yml` | Security smells | AdminByDefault, HardCoded, UnsecureProtocol, RemoteTriggers, UntrustedDependencies |
+| `maintenance_issues.yml` | Maintenance smells | CodeReplica, ErrorHandling, Misconfiguration |
+| `complex_workflow.yml` | All smell types | All 9 smell types |
+| `malformed_workflow.yml` | Error handling | Invalid YAML |
 
-### Fixtures de Repositório Real
+### Real Repository Fixtures
 
-Clonados em runtime via sparse checkout:
+Cloned at runtime via sparse checkout:
 
-| Repositório | Propósito | Cenário |
+| Repository | Purpose | Scenario |
 |------------|---------|----------|
-| `actions/starter-workflows` | Golden master, Análise de repo real | 1, 3 |
-| `juice-shop/juice-shop` | Validação de segurança | 2 |
+| `actions/starter-workflows` | Golden master, Real repo analysis | 1, 3 |
+| `juice-shop/juice-shop` | Security validation | 2 |
 
-## Solução de Problemas
+## Troubleshooting
 
-### Testes Falham com "Token not available"
+### Tests Fail with "Token not available"
 
-**Solução**: Exporte a variável de ambiente `GITHUB_TOKEN`:
+**Solution**: Export `GITHUB_TOKEN` environment variable:
 ```bash
-export GITHUB_TOKEN=seu_token_aqui
+export GITHUB_TOKEN=your_token_here
 pytest Test/E2E/ -v
 ```
 
-### Testes Falham com "Could not clone repository"
+### Tests Fail with "Could not clone repository"
 
-**Causa**: Problemas de rede ou rate limiting do GitHub
+**Cause**: Network issues or GitHub rate limiting
 
-**Soluções**:
-- Verifique conexão com internet
-- Aguarde alguns minutos (reset de rate limit)
-- Execute apenas testes mock token: `pytest Test/E2E/ -v -m "not requires_real_token"`
+**Solutions**:
+- Check internet connection
+- Wait a few minutes (rate limit reset)
+- Run only mock token tests: `pytest Test/E2E/ -v -m "not requires_real_token"`
 
-### Testes Dão Timeout
+### Tests Timeout
 
-**Causa**: Clones de repositórios reais podem demorar
+**Cause**: Real repository clones can take time
 
-**Soluções**:
-- Aumente timeout: `pytest Test/E2E/ -v --timeout=300`
-- Pule testes lentos: `pytest Test/E2E/ -v -m "not slow"`
+**Solutions**:
+- Increase timeout: `pytest Test/E2E/ -v --timeout=300`
+- Skip slow tests: `pytest Test/E2E/ -v -m "not slow"`
 
-### Testes de Memória Pulados
+### Memory Tests Skipped
 
-**Causa**: `psutil` não instalado
+**Cause**: `psutil` not installed
 
-**Solução**:
+**Solution**:
 ```bash
 pip install psutil
 pytest Test/E2E/ -v -k "memory"
 ```
 
-### Falsos Positivos em Workflows Limpos
+### False Positives on Clean Workflows
 
-**Problemas Conhecidos**:
-- Detector `ErrorHandling` tem bugs com validação de timeout (reporta falsos positivos)
-- Detector `Misconfiguration` tem bugs com validação de `defaults` e `run`/`uses`
+**Known Issues**:
+- `ErrorHandling` detector has bugs with timeout validation (reports false positives)
+- `Misconfiguration` detector has bugs with `defaults` and `run`/`uses` validation
 
-**Impacto**: 3 testes no Cenário 1 podem falhar (comportamento documentado)
+**Impact**: 3 tests in Scenario 1 may fail (documented behavior)
 
-**Rastreamento**: Estes são bugs conhecidos nos detectores, não falhas de teste
+**Tracking**: These are known detector bugs, not test failures
 
-## Benchmarks de Performance
+## Performance Benchmarks
 
-Performance esperada em hardware típico:
+Expected performance on typical hardware:
 
-| Operação | Tempo Esperado | Real (MacBook Air M1) |
+| Operation | Expected Time | Actual (MacBook Air M1) |
 |-----------|---------------|-------------------------|
-| Workflow único | < 30s | ~0.1s |
+| Single workflow | < 30s | ~0.1s |
 | Batch 50 workflows | < 5min | ~0.5s |
-| Suite E2E completa | < 15min | ~15s |
-| Clone de repo real | < 2min | ~5-10s |
+| Complete E2E suite | < 15min | ~15s |
+| Real repo clone | < 2min | ~5-10s |
 
-## Contribuindo
+## Contributing
 
-Ao adicionar novos testes E2E:
+When adding new E2E tests:
 
-1. Siga padrões existentes nos arquivos de cenário
-2. Adicione docstrings claras explicando o que está sendo testado
-3. Use mensagens de asserção descritivas
-4. Considere se o teste precisa de token real
-5. Atualize este README se adicionar novos cenários
-6. Garanta que testes passem localmente antes de commitar
+1. Follow existing patterns in scenario files
+2. Add clear docstrings explaining what's being tested
+3. Use descriptive assertion messages
+4. Consider whether test needs real token
+5. Update this README if adding new scenarios
+6. Ensure tests pass locally before committing
 
-## Integração CI/CD
+## CI/CD Integration
 
-### Workflow GitHub Actions
+### GitHub Actions Workflow
 
-A suite de testes E2E executa automaticamente em:
-- **Push** para branches `prod` ou `main`
-- **Pull Requests** para `prod` ou `main`
-- **Trigger manual** via `workflow_dispatch`
+The E2E test suite runs automatically on:
+- **Push** to `prod` or `main` branches
+- **Pull Requests** to `prod` or `main`
+- **Manual trigger** via `workflow_dispatch`
 
-### Matriz de Testes
+### Test Matrix
 
 - **OS**: Ubuntu, macOS
 - **Python**: 3.9, 3.10, 3.11, 3.12
-- **Modos**: Mock token, Token real, Suite completa
+- **Modes**: Mock token, Real token, Complete suite
 
-### Artefatos
+### Artifacts
 
-Resultados de testes são enviados como artefatos:
-- Retenção: 7 dias (mock/real), 30 dias (completo)
-- Localização: `.pytest_cache/`, `Test/E2E/*.log`
+Test results are uploaded as artifacts:
+- Retention: 7 days (mock/real), 30 days (complete)
+- Location: `.pytest_cache/`, `Test/E2E/*.log`
 
-## Resumo
+## Summary
 
-Esta suite de testes E2E fornece validação compreensiva da funcionalidade do GASH:
+This E2E test suite provides comprehensive validation of GASH functionality:
 
-- ✅ 103 testes através de 7 cenários
-- ✅ 94% taxa de aprovação (3 bugs conhecidos nos detectores)
-- ✅ Modos mock e token real
-- ✅ Benchmarking de performance
-- ✅ Integração CI/CD
-- ✅ Documentação extensiva
+- ✅ 103 tests across 7 scenarios
+- ✅ 94% pass rate (3 known detector bugs)
+- ✅ Mock and real token modes
+- ✅ Performance benchmarking
+- ✅ CI/CD integration
+- ✅ Extensive documentation
 
-Para questões ou problemas, por favor abra uma issue no GitHub.
+For questions or issues, please open an issue on GitHub.

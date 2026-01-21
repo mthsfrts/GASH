@@ -67,7 +67,7 @@ jobs:
         # UnsecureProtocol smell: HTTP in command
         run: |
           export DB_PASSWORD="password123"
-          export API_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+          export API_TOKEN="fake_github_token_xxxxxxxxxxxxxxxxxxxxxxxx"
           curl http://setup.insecure.com/init.sh | bash
         env:
           # HardCoded smell: more secrets

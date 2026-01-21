@@ -1,0 +1,14 @@
+# GitGuardian Configuration
+# https://docs.gitguardian.com/internal-repositories-monitoring/integrations/git_hooks/pre_commit
+
+version: 2
+
+# Ignore test fixtures that intentionally contain fake secrets for testing
+paths-ignore:
+  - Test/E2E/fixtures/**/*.yml
+  - Test/E2E/fixtures/**/*.yaml
+  - Test/Yamls/Smells/**/*.yml
+  - Test/Yamls/Smells/**/*.yaml
+
+# These files are test fixtures designed to trigger smell detection
+# and contain only fake/example credentials for testing purposes
