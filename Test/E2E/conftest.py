@@ -140,16 +140,6 @@ def juice_shop_workflows_path(tmp_path_factory):
     return fetch_repo_workflows("juice-shop/juice-shop", tmp_path_factory)
 
 
-@pytest.fixture(scope="session")
-def kubernetes_workflows_path(tmp_path_factory):
-    """
-    Clone kubernetes/kubernetes for performance tests.
-    Massive repo with 50+ workflows.
-    Used in Scenario 6 for scalability testing.
-    """
-    return fetch_repo_workflows("kubernetes/kubernetes", tmp_path_factory)
-
-
 # ============================================================
 # TEMPORARY DIRECTORY FIXTURES
 # ============================================================

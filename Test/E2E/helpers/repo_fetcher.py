@@ -23,9 +23,6 @@ def fetch_repo_workflows(repo: str, tmp_path_factory, branch: str = "main") -> O
     Returns:
         Path to the workflows directory, or None if clone fails
 
-    Example:
-        >>> path = fetch_repo_workflows("kubernetes/kubernetes", tmp_path_factory)
-        >>> list(path.glob("*.yml"))  # List all workflow files
     """
     repo_name = repo.replace("/", "_")
     dest = tmp_path_factory.mktemp(repo_name)
