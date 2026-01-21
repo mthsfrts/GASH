@@ -1,0 +1,8 @@
+name: No Retry
+on: push
+jobs:
+  network:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Data
+        run: curl https://api.exemplo.com/large-file

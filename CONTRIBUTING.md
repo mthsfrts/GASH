@@ -1,4 +1,4 @@
-## Contribuindo com o Projeto GASH
+# Contribuindo para o GASH
 
 Primeiramente, agradecemos por dedicar-se a colaborar com o projeto GASH - **The GitHub Actions Smell Hunter**! O objetivo deste documento é definir um conjunto de boas práticas e processos para lhe auxiliar na manutenibilidade do projeto.
 
@@ -34,7 +34,8 @@ Seja qual for a forma escolhida, por favor, seja atencioso e respeite nosso cód
 
 ---
 
-## Pull Requests
+### Configurando o Ambiente de Desenvolvimento
+Para rodar o GASH localmente e testar suas alterações:
 
 > Antes de [abrir um Pull Request](https://github.com/mthsfrts/GASH/pulls), verifique se:
 - Existe uma issue vinculada ao seu PR.
@@ -108,7 +109,10 @@ Os seguintes critérios devem ser cumpridos:
 
 Após elencarmos algumas boas práticas isoladas para mantenedores no que diz respeito à contribuição, é importante que tenhamos noção do todo, isto é, de como essas boas práticas se inserem em um fluxo de contribuição.
 
-### Passos para uma contribuição seguindo boas práticas
+- Toda comunicação, principalmente a respeito de Issues e/ou Pull Requests, deve ser de fácil acesso aos mantenedores e colaboradores.
+- Seja objetivo, tente resumir seu comentário adequadamente.
+- Sugestões de melhoria, correções e novas ideias devem sempre ser abertas como Issue antes da implementação.
+- Mantenha o respeito e a cortesia. Estamos todos aqui para aprender e construir uma ferramenta melhor.
 
 - Primeiramente, faça um fork do projeto, de forma que seja possível contribuir com novas funcionalidades/correções ao projeto GASH sem comprometer o repositório remoto.
 - Crie boas branches, isto é, branches descritivas, e que, além disso, sigam um padrão, visando uma melhor organização das branches e tornando uma possível futura busca mais fácil.

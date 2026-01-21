@@ -45,3 +45,5 @@ def test_integration():
                          'Use the least privilege principle.']
 
     assert findings == expected_findings
+
+
