@@ -20,7 +20,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 from Analysis.Parse.ActionParser import Action
 from Analysis.Smells.Categories.Security.AdminByDefault.AdminByDefaultFct import AdminByDefaultFct
 from Analysis.Smells.Categories.Security.HardCoded.HardCodedFct import HardCodedFct
-from Analysis.Smells.Categories.Security.RemoteTriggers.RemoteRunFct import RemoteRunFct
+from Analysis.Smells.Categories.Security.RemoteTriggers.RemoteTriggersFct import RemoteRunFct
 from Analysis.Smells.Categories.Security.UnsecureProtocol.UnsecureProtocolFct import UnsecureProtocolFct
 from Analysis.Smells.Categories.Maintenance.CodeReplica.CodeReplicaFct import CodeReplicaFct
 from Analysis.Smells.Categories.Maintenance.ErrorHandling.ErrorHandlingFct import ErrorHandlingFct
