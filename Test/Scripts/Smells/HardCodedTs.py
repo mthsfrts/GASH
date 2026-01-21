@@ -9,6 +9,9 @@ logging.basicConfig(level=logging.DEBUG)
 
 @pytest.fixture
 def workflow():
+    """
+    Workflow com múltiplos secrets hardcoded em diferentes níveis
+    """
     workflow = Workflow.Workflow()
     workflow.env = {"API_KEY": "my_secret_key"}
 
@@ -26,6 +29,13 @@ def workflow():
 
 
 def test_hard_coded_secret_detection(workflow):
+    """
+    Deve detectar secrets hardcoded em:
+    - env do workflow
+    - env do job
+    - env do step
+    - comando run do step
+    """
     logging.debug(f"Running test_hard_coded_secret_detection with workflow: {workflow}")
     factory = HardCodedFct(content=workflow)
     findings = factory.detect()
@@ -41,7 +51,71 @@ def test_hard_coded_secret_detection(workflow):
     assert findings == expected_findings
 
 
+def test_safe_secret_not_detected():
+    """
+    Secrets referenciados via ${{ secrets.X }} não devem ser detectados
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {"API_KEY": "${{ secrets.API_KEY }}"}
+
+    job = Jobs.Job()
+    job.env = {}
+    job.steps = []
+
+    workflow.jobs = {"build": job}
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+
+    assert findings == []
+
+
+def test_clean_workflow_no_findings():
+    """
+    Workflow limpo não deve gerar findings
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {}
+
+    job = Jobs.Job()
+    job.env = {}
+    job.steps = []
+
+    workflow.jobs = {"build": job}
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+
+    assert findings == []
+
+
+def test_secret_in_comment_not_detected():
+    """
+    Secrets apenas em comentários não devem ser detectados
+    """
+    workflow = Workflow.Workflow()
+    workflow.env = {}
+
+    job = Jobs.Job()
+    job.env = {}
+
+    step = Steps.Step()
+    step.run = "# token=abc123"
+    step.env = {}
+
+    job.steps = [step]
+    workflow.jobs = {"build": job}
+
+    factory = HardCodedFct(content=workflow)
+    findings = factory.detect()
+
+    assert findings == []
+
+
 def test_integration():
+    """
+    Teste de integração com workflow real
+    """
     logging.debug("Running test_integration")
     action = Action(file_path="../../Yamls/Smells/Prisma/manage-dist-tag.yml")
     workflow = action.prepare_for_analysis()
