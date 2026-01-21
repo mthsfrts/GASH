@@ -1,84 +1,61 @@
 # Contribuindo para o GASH
 
-Obrigado pelo interesse em contribuir com o **GASH (GitHub Actions Smell Hunter)**! Somos um projeto Open Source e dependemos da colaboração da comunidade para evoluir nossa ferramenta de detecção de *smells* em CI/CD. O objetivo deste documento é definir um conjunto de boas práticas e processos para lhe auxiliar na manutenibilidade do projeto.
+Primeiramente, agradecemos por dedicar-se a colaborar com o projeto GASH - **The GitHub Actions Smell Hunter**! O objetivo deste documento é definir um conjunto de boas práticas e processos para lhe auxiliar na manutenibilidade do projeto.
 
-Este guia detalha como configurar o ambiente, entender a estrutura do código e submeter suas contribuições.
+### Existem várias maneiras de contribuir:
+
+- Reportar bugs ou solicitar novas funcionalidades através de Issues.
+- Resolver issues abertas no código existente. 
+- Melhorar a documentação.
+- Sugerir refatorações e melhorias de performance.
+
+Seja qual for a forma escolhida, por favor, seja atencioso e respeite nosso código de conduta.
 
 ---
 
-## Primeiros Passos
+## Comunicação
 
-### Pré-requisitos
-Como o GASH é construído em Python, você precisará ter instalado:
-- **Python 3.8+**
-- **Git**
+- Toda comunicação, principalmente a respeito de Issues e/ou Pull Requests, deve ser de fácil acesso aos mantenedores e colaboradores.
+- Respeito sempre! Não utilize linguagem ofensiva ou grosseira.
+- Seja objetivo, tente resumir seu comentário adequadamente.
+- Sugestões de melhoria, correções e novas ideias devem sempre ser abertas como Issue antes da implementação.
+
+---
+
+## Issues
+
+> Antes de abrir uma Issue, verifique se:
+- O problema/sugestão já foi lançado em Issues.
+- Caso não exista, [abra a issue](https://github.com/mthsfrts/GASH/issues/new) contendo:
+  - Título conciso e resumido.
+  - Descrição detalhada.
+  - Prints (se for um bug).
+  - Utilização de labels adequadas.
+
+---
 
 ### Configurando o Ambiente de Desenvolvimento
 Para rodar o GASH localmente e testar suas alterações:
 
-1.  **Faça o Fork e Clone o repositório:**
-    ```bash
-    git clone git@github.com:mthsfrts/GASH.git
-    cd GASH
-    ```
-
-2.  **Instale as dependências:**
-    Utilizamos o arquivo `requirements.txt` para gerenciar os pacotes.
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-3.  **Execute a ferramenta:**
-    O ponto de entrada da CLI é o arquivo `GASH.py`.
-    ```bash
-    python3 GASH.py --help
-    ```
+> Antes de [abrir um Pull Request](https://github.com/mthsfrts/GASH/pulls), verifique se:
+- Existe uma issue vinculada ao seu PR.
+- Inclua um resumo descritivo sobre as mudanças.
+- Desenvolva recursos em uma branch - não trabalhe na branch _prod_.
+- Marque a issue vinculada com as palavras-chave, encontradas em [linking-a-pull-request-to-an-issue](https://docs.github.com/pt/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue).
 
 ---
 
-## Estrutura do Projeto
+## Testes e Verificações
 
-Para facilitar sua navegação, aqui está como organizamos nosso código fonte:
+### Código
 
-* **`/APIs`**: Contém as integrações e wrappers para comunicação externa (ex: GitHub API). Se você precisa alterar como buscamos dados remotos, mexa aqui.
-* **`/Analysis`**: O módulo central de detecção. Aqui reside a lógica que analisa os arquivos YAML em busca dos *smells* configurados.
-* **`/Miner`**: Scripts responsáveis pela mineração de repositórios e commits (modos `repo` e `commits` da CLI).
-* **`/Utils`**: Funções auxiliares e utilitários compartilhados por todo o projeto.
-* **`/Test`**: Testes unitários e de integração. **Toda nova feature deve ter testes correspondentes aqui.**
-* **`GASH.py`**: O arquivo principal (Entry Point) que gerencia a CLI e orquestra os módulos.
+> Antes de submeter um código ou Pull Request (PR), verificações de qualidade e testes devem ser executados para garantir que o código enviado não comprometa a integridade do projeto. A seguir, os principais requisitos de testes e verificações que devem ser realizados em cada PR:
+- **_Estilo e Formatação_**: indentação correta e declaração adequada de funções e variáveis.
+- **_Performance (Efetividade e Eficiência)_**: checar funcionalidade do código e verificar se há possíveis gargalos na performance.
+- **_Segurança_**: revisão de código, autenticação e controle de acesso, e proteção contra vulnerabilidades.
 
----
+### Documentação
 
-## Como Contribuir
-
-### 1. Reportando Bugs e Sugestões (Issues)
-> Antes de codar, verifique as [Issues abertas](https://github.com/mthsfrts/GASH/issues).
-- Se for um **Bug**: Inclua passos para reproduzir, prints e o arquivo YAML que causou erro.
-- Se for uma **Feature**: Descreva o problema que ela resolve e como você imagina a implementação.
-- Sempre verifique se sua Issue contém:
-  - Título conciso e resumido.
-  - Descrição detalhada.
-  - Utilização de labels adequadas.
-
-### 2. Desenvolvimento e Padrões de Código
-> Para manter a qualidade e consistência, seguimos estas diretrizes:
-
-* **Estilo Python (PEP 8):** Mantenha o código formatado segundo o [guia de estilo oficial PEP 8](https://peps.python.org/pep-0008/). Recomendamos usar formatadores como `Black` ou `Autopep8` antes de subir.
-    ```bash
-    pip install black
-    black .
-    ```
-* **Type Hinting:** Sempre que possível, utilize tipagem estática nas assinaturas das funções para facilitar a leitura e manutenção.
-    * *Exemplo:* `def analyze_yaml(file_path: str) -> dict:`
-* **Docstrings:** Documente classes e funções complexas explicando *o que* fazem e *quais* parâmetros esperam.
-* **Modularidade:** Evite funções gigantes em `GASH.py`. Tente delegar a lógica para `Analysis` ou `Utils`.
-
-### 3. Testes
-> Não aceitamos código sem testes.
-- Certifique-se de que seus testes estão passando localmente antes de abrir o PR.
-- Adicione novos casos de teste na pasta `/Test` se você criar uma nova lógica de detecção.
-
-### 4. Melhorar a documentação
 > Para garantir que a documentação do projeto reflita precisamente o estado atual do código, é necessário que ela cubra os mais variados aspectos de maneira clara e informativa. Sendo assim, temos como necessário verificar os seguintes aspectos da documentação:
 - Ortografia e gramática.
 - Clareza e Compreensão.
@@ -88,32 +65,65 @@ Para facilitar sua navegação, aqui está como organizamos nosso código fonte:
 
 ---
 
-## Processo de Pull Request (PR)
+## Padrão de código
 
-1. **Antes de [abrir um Pull Request](https://github.com/mthsfrts/GASH/pulls), verifique se:**
-    * Existe uma issue vinculada ao seu PR. 
-    * Caso não exista, [reporte uma nova issue](#1-reportando-bugs-e-sugestões-issues).
-2.  **Crie uma Branch:** Nunca trabalhe direto na branch `prod`. Use nomes descritivos:
-    * `feat/novo-detector-smell`
-    * `fix/erro-api-github`
-    * `docs/atualizacao-readme`
-3.  **Commit Semântico:** Escreva mensagens de commit claras, com um resumo descritivo sobre as mudanças.
-4.  **Abra o PR:**
-    * [Vincule a Issue](https://docs.github.com/pt/issues/tracking-your-work-with-issues/using-issues/linking-a-pull-request-to-an-issue) que você está resolvendo.
-    * Preencha o template do PR descrevendo as mudanças.
-5.  **Revisão (Code Review):**
-    * Mantenedores revisarão seu código focando em arquitetura, segurança e funcionalidade.
-    * Esteja aberto a feedbacks e ajustes. Discussões técnicas acontecem dentro do PR.
+> Um padrão de códigos é muito importante para a facilidade de contribuição de muitos mantenedores, pois como muito bem citado anteriormente, a não clareza de um código pode atrasar os objetivos do grupo. Logo, devemos ter clareza e organização nos códigos. Essa boa prática ajuda a manter a consistência e a fluidez do projeto, diminuindo a chance de erros no desenvolvimento do projeto.
+Os seguintes critérios devem ser cumpridos:
+
+- **_Código bem estruturado_**: os blocos de código devem ser bem consistentes e seguir um fluxo lógico facilitando a compreensão do código.
+- **_Código legível_**: utilizar espaçamento, indentação correta e evitar estruturas complexas, garantindo que qualquer colaborador facilmente entenda o que está sendo feito.
+- **_Nomes precisos_**: a nomenclatura utilizada para variáveis ou funções deve ser clara e condizente com o objetivo dela, contribuindo com a legibilidade do código.
+- **_Evitar duplicação_**: utilizar funções já existentes é uma boa prática, evitando a criação de funções repetidas ou que possuam o mesmo objetivo, mantendo um código limpo e organizado.
+- **_Tratamento correto de erros_** - mensagens de erro e tratamento dos mesmos devem ser claros.
+- **_Uso adequado de comentários_** - comentar a lógica e funções de partes do código pode ajudar a entender o que está sendo feito, porém o cuidado com comentários redundantes ou desnecessários será importante para manter o código limpo.
+- **_Evitar fragmentos de código inutilizados_** - variáveis e funções não utilizadas devem ser removidas e evitadas.
 
 ---
 
-## Comunicação e Conduta
+## Revisão de Código
+
+> É fundamental para a manutenção do projeto que os mantenedores tenham noção de como realizar uma revisão de código, garantindo que o código enviado ao repositório principal seja bem escrito, seguro e alinhado com as diretrizes desta documentação.
+### Princípios:
+
+- Toda contribuição deve, ao final, passar por uma revisão antes de se aplicar o merge, garantindo que as alterações não comprometam o projeto.
+- Revisores devem manter um tom respeitoso, colaborativo e construtivo, proporcionando uma comunicação saudável, como discutido na seção "Comunicação".
+- Não se deve inserir opinião ou estilo pessoal na revisão: o que importa de fato é a qualidade da contribuição.
+- Discussões técnicas devem ser registradas diretamente no PR.
+
+### Um revisor deve verificar:
+
+- A corretude do programa.
+- A qualidade do código, seguindo os padrões estabelecidos em "Padrão de Código".
+- A arquitetura, visando mantê-la alinhada ao design do projeto.
+- Os riscos, para evitar problemas de segurança ou de performance.
+- A documentação, garantindo que ela está devidamente atualizada e que siga o padrão de documentação definido na seção **Testes e Verificações**.
+- Os testes, com o objetivo de manter a validade dos testes e de conferir se há funcionalidades não testadas.
+
+### Quem pode ser um revisor?
+
+- Apenas mantenedores ou contribuidores escolhidos pela liderança do projeto GASH, com certo histórico de contribuições.
+
+---
+
+## Fluxo de Contribuição
+
+Após elencarmos algumas boas práticas isoladas para mantenedores no que diz respeito à contribuição, é importante que tenhamos noção do todo, isto é, de como essas boas práticas se inserem em um fluxo de contribuição.
 
 - Toda comunicação, principalmente a respeito de Issues e/ou Pull Requests, deve ser de fácil acesso aos mantenedores e colaboradores.
 - Seja objetivo, tente resumir seu comentário adequadamente.
 - Sugestões de melhoria, correções e novas ideias devem sempre ser abertas como Issue antes da implementação.
 - Mantenha o respeito e a cortesia. Estamos todos aqui para aprender e construir uma ferramenta melhor.
 
+- Primeiramente, faça um fork do projeto, de forma que seja possível contribuir com novas funcionalidades/correções ao projeto GASH sem comprometer o repositório remoto.
+- Crie boas branches, isto é, branches descritivas, e que, além disso, sigam um padrão, visando uma melhor organização das branches e tornando uma possível futura busca mais fácil.
+- Siga o padrão de código e os critérios definidos no tópico **Padrão de Código**, buscando facilitar o trabalho dos demais mantenedores em realizar futuras contribuições, tornando o código legível e organizado.
+- Ao contribuir ao projeto, lembre-se de seguir as diretrizes desse documento, de forma que a contribuição possa ser aceita.
+- Antes de abrir o PR, como visto no tópico **Testes e Verificações**, é importante verificar todos os testes para garantir que não há bugs ocasionados pelas alterações, visando não comprometer a integridade do projeto.
+  - Lembre-se de seguir o padrão de PR elencado no tópico **Pull Request**.
+  - Também é importante ficar atento aos requisitos de testes e verificações, definidos no tópico **Testes e Verificações**.
+- Após isso, é interessante que o contribuidor participe de revisões e faça ajustes, principalmente no que diz respeito às funcionalidades por ele implementadas.
+
+---
 
 ## Vamos Construir Juntos!
 

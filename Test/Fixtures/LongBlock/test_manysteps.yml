@@ -1,0 +1,36 @@
+name: Teste Muitos Steps
+on: push
+jobs:
+  job-infinito:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "passo 1"
+      - run: echo "passo 2"
+      - run: echo "passo 3"
+      - run: echo "passo 4"
+      - run: echo "passo 5"
+      - run: echo "passo 6"
+      - run: echo "passo 7"
+      - run: echo "passo 8"
+      - run: echo "passo 9"
+      - run: echo "passo 10"
+      - run: echo "passo 11"
+      - run: echo "passo 12"
+      - run: echo "passo 13"
+      - run: echo "passo 14"
+      - run: echo "passo 15"
+      - run: echo "passo 16"
+      - run: echo "passo 17"
+      - run: echo "passo 18"
+      - run: echo "passo 19"
+      - run: echo "passo 20"
+      - run: echo "passo 21"
+      - run: echo "passo 22"
+      - run: echo "passo 23"
+      - run: echo "passo 24"
+      - run: echo "passo 25"
+      - run: echo "passo 26"
+      - run: echo "passo 27"
+      - run: echo "passo 28"
+      - run: echo "passo 29"
+      - run: echo "passo 30"

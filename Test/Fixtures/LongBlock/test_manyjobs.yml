@@ -1,0 +1,63 @@
+name: Muitos Jobs
+on: push
+jobs:
+  job-1:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-2:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-3:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-4:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-5:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-6:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-7:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-8:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-9:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-10:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-11:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-12:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-13:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-14:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-15:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-16:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-17:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-18:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-19:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
+  job-20:
+    runs-on: ubuntu-latest
+    steps: [{run: echo ok}]
