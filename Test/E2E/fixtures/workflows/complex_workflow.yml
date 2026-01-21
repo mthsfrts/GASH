@@ -1,0 +1,176 @@
+# Complex Workflow - All 9 smell types expected
+# This workflow intentionally contains all smell categories for comprehensive testing
+# Used in Scenario 2 to validate full smell detection coverage
+#
+# Smells included:
+# 1. AdminByDefault - write-all permissions
+# 2. HardCoded - hardcoded secrets
+# 3. RemoteTriggers - misconfigured remote triggers
+# 4. UnsecureProtocol - HTTP URLs
+# 5. UntrustedDependencies - unverified actions
+# 6. CodeReplica - duplicated code blocks
+# 7. ErrorHandling - missing error handling
+# 8. Misconfiguration - configuration issues
+# 9. LongBlocks - excessively long code blocks
+
+name: Complex Workflow With All Smells
+
+# RemoteTriggers smell: workflow_dispatch without inputs
+on:
+  workflow_dispatch:
+  workflow_call:
+    secrets:
+      INHERITED_SECRET:
+        required: true
+  repository_dispatch:
+
+# AdminByDefault smell: write-all at workflow level
+permissions: write-all
+
+# Misconfiguration smell: concurrency without group
+concurrency:
+  cancel-in-progress: true
+
+env:
+  # HardCoded smell: secrets in global env
+  GLOBAL_API_KEY: "api_key_12345_hardcoded"
+  # UnsecureProtocol smell: HTTP URL
+  BACKEND_URL: "http://api.insecure-backend.com"
+
+jobs:
+  # Job with multiple smells
+  build-and-test:
+    runs-on: ubuntu-latest
+    # AdminByDefault smell: elevated job permissions
+    permissions:
+      contents: write
+      packages: write-all
+    # ErrorHandling smell: continue on error
+    continue-on-error: true
+    # ErrorHandling smell: insufficient timeout
+    timeout-minutes: 1
+    strategy:
+      # ErrorHandling smell: fail-fast disabled
+      fail-fast: false
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        continue-on-error: true
+
+      # UntrustedDependencies smell: unverified action
+      - name: Use unknown action
+        uses: malicious-org/steal-secrets@main
+
+      - name: Setup with hardcoded secrets
+        # HardCoded smell: inline secrets
+        # UnsecureProtocol smell: HTTP in command
+        run: |
+          export DB_PASSWORD="password123"
+          export API_TOKEN="fake_github_token_xxxxxxxxxxxxxxxxxxxxxxxx"
+          curl http://setup.insecure.com/init.sh | bash
+        env:
+          # HardCoded smell: more secrets
+          PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----"
+          AWS_ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
+
+      # LongBlocks smell: excessively long run block
+      - name: Very long build step
+        run: |
+          echo "Step 1: Initialize"
+          echo "Step 2: Configure"
+          echo "Step 3: Prepare environment"
+          echo "Step 4: Download dependencies"
+          echo "Step 5: Verify checksums"
+          echo "Step 6: Extract packages"
+          echo "Step 7: Set permissions"
+          echo "Step 8: Create directories"
+          echo "Step 9: Copy files"
+          echo "Step 10: Configure paths"
+          echo "Step 11: Set environment variables"
+          echo "Step 12: Initialize database"
+          echo "Step 13: Run migrations"
+          echo "Step 14: Seed data"
+          echo "Step 15: Build frontend"
+          echo "Step 16: Build backend"
+          echo "Step 17: Run unit tests"
+          echo "Step 18: Run integration tests"
+          echo "Step 19: Generate reports"
+          echo "Step 20: Package artifacts"
+          echo "Step 21: Sign packages"
+          echo "Step 22: Upload to registry"
+          echo "Step 23: Notify team"
+          echo "Step 24: Update documentation"
+          echo "Step 25: Cleanup temporary files"
+          echo "Step 26: Archive logs"
+          echo "Step 27: Send metrics"
+          echo "Step 28: Update status"
+          echo "Step 29: Finalize"
+          echo "Step 30: Complete"
+
+  # CodeReplica smell: duplicated job structure
+  duplicate-job-1:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npm run build
+
+  # CodeReplica smell: same structure as above
+  duplicate-job-2:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install
+        run: npm install
+      - name: Build
+        run: npm run build
+
+  # Misconfiguration smell: missing runs-on
+  misconfigured-job:
+    needs: build-and-test
+    # Missing runs-on field
+    steps:
+      - name: Deploy
+        run: echo "Deploying"
+        # Misconfiguration smell: overly complex conditional
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push' && (success() || failure()) && !cancelled() && contains(github.event.head_commit.message, '[deploy]')
+
+  # More smells in final job
+  final-deploy:
+    runs-on: ubuntu-latest
+    needs: [duplicate-job-1, duplicate-job-2]
+    permissions:
+      contents: write
+
+    steps:
+      # Misconfiguration smell: fuzzy version
+      - uses: actions/checkout@v4.*
+
+      # UntrustedDependencies smell: another unverified action
+      - name: Unknown deploy action
+        uses: random-person/deploy-anywhere@latest
+
+      - name: Final deployment
+        run: |
+          # UnsecureProtocol smell: more HTTP URLs
+          wget http://releases.example.com/latest.tar.gz
+          curl http://metrics.example.com/report
+        env:
+          # HardCoded smell: deployment secrets
+          DEPLOY_KEY: "deploy_secret_key_xyz789"
+          SERVER_PASSWORD: "admin123"

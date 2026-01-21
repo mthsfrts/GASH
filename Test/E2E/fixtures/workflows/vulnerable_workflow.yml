@@ -1,0 +1,72 @@
+# Vulnerable Workflow - Security smells expected
+# This workflow intentionally contains security issues for testing
+# Used in Scenario 2 to validate security smell detection
+
+name: Vulnerable Workflow
+
+# RemoteTriggers smell: workflow_dispatch without proper configuration
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [external-trigger]
+
+# AdminByDefault smell: write-all permissions at workflow level
+permissions: write-all
+
+env:
+  # HardCoded smell: hardcoded secrets in environment
+  API_KEY: "sk_live_abc123xyz789secretkey"
+  DB_PASSWORD: "super_secret_password_123"
+  # UnsecureProtocol smell: HTTP URL
+  API_ENDPOINT: "http://insecure-api.example.com/v1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # AdminByDefault smell: elevated permissions at job level
+    permissions:
+      contents: write
+      actions: write-all
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy with hardcoded credentials
+        # HardCoded smell: inline secrets in run command
+        # UnsecureProtocol smell: HTTP in curl command
+        run: |
+          echo "Using API key: sk_test_hardcoded_key_12345"
+          curl http://vulnerable-endpoint.example.com/deploy \
+            -H "Authorization: Bearer hardcoded_token_xyz"
+          mysql -u root -ppassword123 -h db.example.com
+        env:
+          # HardCoded smell: more hardcoded secrets
+          PRIVATE_KEY: "-----BEGIN RSA PRIVATE KEY-----\nMIIE..."
+          AWS_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+
+      - name: Use unverified action
+        # UntrustedDependencies smell: action from unknown/unverified source
+        uses: unknown-user/potentially-malicious-action@main
+
+      - name: Another unverified action
+        # UntrustedDependencies smell: action without version pinning
+        uses: random-org/unverified-deploy@latest
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    permissions:
+      contents: write
+
+    steps:
+      - name: Insecure deployment
+        run: |
+          # UnsecureProtocol smell: FTP and HTTP
+          ftp -n ftp.example.com <<EOF
+          user anonymous password
+          put sensitive_data.txt
+          EOF
+          wget http://downloads.example.com/installer.sh | bash
+        env:
+          WEBHOOK_URL: "http://hooks.slack.com/insecure"

@@ -1,0 +1,35 @@
+# Malformed Workflow - Invalid YAML for error handling tests
+# This file intentionally contains YAML syntax errors
+# Used in Scenario 7 to validate graceful error handling
+
+name: Malformed Workflow
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Invalid YAML: bad indentation
+    - name: This step has wrong indentation
+      run: echo "bad indent"
+
+      # Invalid YAML: missing colon
+      - name Missing colon here
+        run: echo "missing colon"
+
+      # Invalid YAML: unclosed quote
+      - name: "Unclosed string
+        run: echo "test"
+
+      # Invalid YAML: invalid character
+      - name: Step with	tab character
+        run: echo "has tab"
+
+      # Invalid YAML: duplicate key
+      - name: Duplicate step
+        run: echo "first"
+        run: echo "duplicate key"

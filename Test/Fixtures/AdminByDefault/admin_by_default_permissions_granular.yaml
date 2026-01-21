@@ -1,0 +1,23 @@
+name: Granular Permissions Workflow
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run script
+        run: echo "Running with granular permissions"
