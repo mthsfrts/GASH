@@ -9,6 +9,10 @@ on:
       - main
       - 'integration/*'
       - '*.*.x'
+      
+  repository_dispatch:
+    types:
+      - remote-trigger
 
   workflow_dispatch:
 
@@ -102,3 +106,5 @@ on:
     branches:
       - main
     branches-ignore: develop
+
+  
