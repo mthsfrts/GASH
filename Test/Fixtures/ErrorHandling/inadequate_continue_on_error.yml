@@ -1,9 +1,0 @@
-name: Inadequate Continue
-on: push
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    continue-on-error: true
-    steps:
-      - name: Critical Step
-        run: ./deploy.sh

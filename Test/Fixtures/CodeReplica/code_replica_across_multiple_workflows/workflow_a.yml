@@ -1,8 +1,0 @@
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          npm install
-          npm run build
-          npm test
