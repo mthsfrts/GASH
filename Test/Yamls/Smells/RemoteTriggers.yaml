@@ -9,6 +9,10 @@ on:
       - main
       - 'integration/*'
       - '*.*.x'
+      
+  repository_dispatch:
+    types:
+      - remote-trigger
 
   workflow_dispatch:
 
@@ -79,6 +83,17 @@ on:
         description: Sixteenth input.
         type: string
         required: false
+      call_input_17: # Choice without options.
+        description: Seventeenth input.
+        type: choice
+      call_input_18: # input without description.
+        type: string
+      call_input_19: # input without type defined.
+        description: Nineteenth input.
+        type:
+      call_input_20: # input with invalid type.
+        description: Twentieth input.
+        type: array
 
   workflow_run:
     description: This is a run trigger.
@@ -91,3 +106,5 @@ on:
     branches:
       - main
     branches-ignore: develop
+
+  
